@@ -110,7 +110,7 @@ button{cursor:pointer}
 
 /* tabbar + fab */
 .tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
-.tabbar-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.tabbar-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
 .tab{border:0;background:none;padding:10px 0 12px;font-size:13px;font-weight:500;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
 .tab svg{width:22px;height:22px}
 .tab[aria-current="page"]{color:var(--accent)}
@@ -121,7 +121,8 @@ button{cursor:pointer}
 .scrim.open{display:block}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-radius:22px 22px 0 0;max-height:88vh;overflow:auto;transform:translateY(105%);transition:transform .25s ease;padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px))}
 .sheet.open{transform:none}
-.sheet-in{max-width:560px;margin:0 auto}
+.sheet-in{max-width:560px;margin:0 auto;position:relative}
+.x{position:absolute;right:-6px;top:-2px;width:40px;height:40px;border:0;border-radius:50%;background:var(--soft);color:var(--muted);font-size:22px;line-height:1}
 .grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
 .sheet h2{font-family:"Unbounded",sans-serif;font-weight:500;font-size:19px;margin:0 0 14px}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--soft);border-radius:12px;padding:3px;margin-bottom:16px}
@@ -142,6 +143,63 @@ button{cursor:pointer}
 .btn.danger{flex:0 0 auto;background:none;color:var(--c-gym);border:1px solid var(--line)}
 .err{color:var(--c-gym);font-size:14px;margin-top:-6px;margin-bottom:10px;display:none}
 .sync{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+/* now / next */
+.nn{background:var(--surface);border-radius:16px;margin:0 0 18px;overflow:hidden}
+.nn-row{display:flex;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
+.nn-row:first-child{border-top:0}
+.nn-main{flex:1;min-width:0}
+.nn-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.nn-t{display:block;font-weight:600;overflow-wrap:anywhere}
+.nn-when{flex:0 0 auto;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.nn-when small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+.nn-bar{height:4px;background:var(--soft);border-radius:2px;margin-top:8px;overflow:hidden}
+.nn-bar i{display:block;height:100%;background:var(--accent);border-radius:2px}
+/* free-time rows */
+.row.gap{min-height:40px;padding:8px 14px 8px 30px;font-size:14px;color:var(--muted);background:repeating-linear-gradient(135deg,transparent 0 6px,var(--soft) 6px 7px)}
+.gap-t{flex:1}
+/* tags + deadlines */
+.tag.cls{background:var(--soft);color:var(--ink)}
+.tag.exam{background:var(--c-gym);color:var(--on-accent)}
+.hw{color:var(--c-work);font-weight:600}
+.cd{flex:0 0 auto;font-size:13px;font-weight:600;color:var(--muted);text-align:right}
+.cd.soon{color:var(--c-gym)}
+.cal-card{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:16px;padding:14px;margin:-4px 0 20px;border:0;width:100%;text-align:left}
+.cal-card svg{flex:0 0 28px;height:28px;color:var(--accent)}
+.cal-card b{display:block;font-weight:600}
+.cal-card span{font-size:13px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin:12px 0 0}
+/* stats */
+.stat-nav{display:flex;align-items:center;gap:6px;margin:-8px 0 16px}
+.stat-nav span{flex:1;text-align:center;color:var(--muted);font-size:14px}
+.stat-nav button{border:0;background:var(--surface);border-radius:10px;width:40px;height:36px;font-size:20px;color:var(--ink)}
+.stat-nav button:disabled{opacity:.35}
+.card{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:16px}
+.card h3{font-size:15px;font-weight:600;color:var(--muted);margin:0 0 10px}
+.hero-n{font-family:"Unbounded","Golos Text",sans-serif;font-weight:700;font-size:42px;line-height:1}
+.hero-s{color:var(--muted);margin-top:6px}
+.chart{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:18px}
+.bar{display:flex;flex-direction:column;align-items:center;gap:3px}
+.track{position:relative;width:100%;max-width:30px;height:110px;background:var(--soft);border-radius:4px;overflow:hidden}
+.track i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:4px 4px 0 0}
+.track.fut{background:none;border:1px dashed var(--line)}
+.bar small{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar.is-today small:first-of-type{color:var(--ink);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.tile{background:var(--surface);border-radius:14px;padding:12px}
+.tile b{display:block;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.tile span{font-size:12px;color:var(--muted)}
+.rt{padding:10px 0;border-top:1px solid var(--line)}
+.rt:first-of-type{border-top:0;padding-top:0}
+.rt-h{display:flex;justify-content:space-between;gap:10px}
+.rt-h span{color:var(--muted);font-variant-numeric:tabular-nums;font-size:14px}
+.dots{display:flex;gap:6px;margin-top:6px}
+.dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}
+.dots i.on{background:var(--accent);border-color:var(--accent)}
+.dots i.na{border-color:transparent;background:radial-gradient(circle,var(--line) 2px,transparent 3px)}
+.dots i.fut{border-style:dashed;opacity:.6}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid var(--line);vertical-align:-1px;margin-right:4px}
+.legend i.on{background:var(--accent);border-color:var(--accent)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -158,6 +216,8 @@ button{cursor:pointer}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Хуваарь</button>
     <button class="tab" data-tab="routines">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>Өдөр бүр</button>
+    <button class="tab" data-tab="stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>Дүн</button>
   </div>
 </nav>
 
@@ -176,7 +236,7 @@ const blank = () => ({v:1, updatedAt:0, blocks:[], routines:[], todos:[], checks
 let state = blank();
 try { const s = localStorage.getItem(KEY); if (s) state = Object.assign(blank(), JSON.parse(s)); } catch(e){}
 
-let tab = "day";
+let tab = "day", statOff = 0;
 let sel = new Date(); sel.setHours(0,0,0,0);
 
 /* ---------- helpers ---------- */
@@ -189,6 +249,16 @@ const today = () => { const t=new Date(); t.setHours(0,0,0,0); return t; };
 const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
 const fromKey = k => { const [y,m,dd]=k.split("-").map(Number); return new Date(y,m-1,dd); };
 const tmin = t => { if(!t) return 9999; const [h,m]=t.split(":").map(Number); return h*60+m; };
+const fromMin = m => pad(Math.floor(m/60))+":"+pad(m%60);
+const fmtDur = m => m<60 ? m+" мин" : Math.floor(m/60)+" цаг"+(m%60?" "+(m%60)+" мин":"");
+const dayDiff = (a,b) => Math.round((b-a)/864e5);
+const classTitles = () => [...new Set(state.blocks.filter(b=>b.cat==="class").map(b=>b.title))];
+function shortCls(title){
+  const b = state.blocks.find(x=>x.title===title && x.place);
+  const m = b && b.place.match(/\b[A-Z]{3,5}\d{3}\b/);
+  return m ? m[0] : (title.length>18 ? title.slice(0,17)+"…" : title);
+}
+const todoTags = x => (x.exam?`<span class="tag exam">Шалгалт</span>`:"") + (x.cls?`<span class="tag cls">${esc(shortCls(x.cls))}</span>`:"");
 const daysLabel = arr => arr.length===7 ? "Өдөр бүр" : (arr.length===5 && [0,1,2,3,4].every(i=>arr.includes(i))) ? "Ажлын өдрүүд" : arr.slice().sort().map(i=>DS[i]).join(", ");
 
 /* ---------- storage + sync ---------- */
@@ -227,7 +297,7 @@ function itemsFor(d){
 const app = document.getElementById("app");
 function render(){
   document.querySelectorAll(".tab").forEach(b => b.toggleAttribute("aria-current", false) || (b.dataset.tab===tab && b.setAttribute("aria-current","page")));
-  if (tab==="day") renderDay(); else if (tab==="week") renderWeek(); else renderRoutines();
+  if (tab==="day") renderDay(); else if (tab==="week") renderWeek(); else if (tab==="stats") renderStats(); else renderRoutines();
 }
 
 function renderDay(){
@@ -242,7 +312,7 @@ function renderDay(){
     <div class="day-meta"><span>${sel.getMonth()+1}-р сарын ${sel.getDate()}${isToday?", өнөөдөр":""}</span>
     <span>${it.total ? `<b>${it.done}/${it.total}</b> хийсэн` : ""}</span></div>
     <div class="band" aria-hidden="true"><i style="width:${pct}%"></i></div>
-  </header>
+  </header>${isToday ? nowNextHTML() : ""}
   <div class="week">
     <button class="wk-arrow" data-act="wk" data-n="-7" aria-label="Өмнөх 7 хоног">‹</button>
     <div class="days">`;
@@ -256,15 +326,23 @@ function renderDay(){
   // schedule
   h += `<section class="sec"><h2>Хуваарь</h2>`;
   if (it.blocks.length){
-    h += `<div class="list">` + it.blocks.map(b => {
+    const rows = []; let lastEnd = null;
+    it.blocks.forEach(b => {
+      if (lastEnd!==null && tmin(b.start)-lastEnd>=30) rows.push(gapRow(lastEnd, tmin(b.start)));
+      rows.push(b); lastEnd = Math.max(lastEnd??0, tmin(b.end));
+    });
+    if (lastEnd!==null && lastEnd<22*60) rows.push(`<div class="row gap"><span class="gap-t">Чөлөөт цаг</span><span class="time">${fromMin(lastEnd)}-аас хойш</span></div>`);
+    h += `<div class="list">` + rows.map(b => {
+      if (typeof b==="string") return b;
       const c = CATS[b.cat]||CATS.other, on = it.checked.has(b.id);
       const live = isToday && nowMin>=tmin(b.start) && nowMin<tmin(b.end);
+      const hw = b.cat==="class" ? state.todos.filter(x=>!x.done && x.cls===b.title).length : 0;
       return `<div class="row ${on?"done":""} ${live?"now":""}">
         <span class="stripe" style="background:var(${c.v})"></span>
         <button class="chk" data-act="tick" data-id="${b.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${on}">${CHECK}</button>
         <button class="body" data-act="edit" data-kind="block" data-id="${b.id}">
           <span class="title">${esc(b.title)}</span>
-          <span class="sub">${c.n}${b.place?", "+esc(b.place):""}${live?` <span class="now-tag">· одоо</span>`:""}</span>
+          <span class="sub">${c.n}${b.place?", "+esc(b.place):""}${live?` <span class="now-tag">· одоо</span>`:""}${hw?` · <span class="hw">${hw} даалгавар</span>`:""}</span>
         </button>
         <span class="time">${esc(b.start)}<br>${esc(b.end)}</span>
       </div>`;}).join("") + `</div>`;
@@ -295,9 +373,10 @@ function renderDay(){
   h += `<section class="sec"><h2>Хийх зүйлс</h2>`;
   if (all.length){
     h += `<div class="list">` + all.map(([x,kind]) => {
-      let sub = "";
-      if (kind==="late"){ const d=fromKey(x.date); sub = `<span class="sub late">Хоцорсон, ${d.getMonth()+1}/${d.getDate()}</span>`; }
-      else if (kind==="loose") sub = `<span class="sub">Огноогүй</span>`;
+      let txt = "";
+      if (kind==="late"){ const d=fromKey(x.date); txt = `<span class="late">Хоцорсон, ${d.getMonth()+1}/${d.getDate()}</span>`; }
+      else if (kind==="loose") txt = "Огноогүй";
+      const tags = todoTags(x), sub = (tags||txt) ? `<span class="sub">${tags}${txt}</span>` : "";
       return `<div class="row ${x.done?"done":""}">
         <button class="chk" data-act="todo" data-id="${x.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${x.done}">${CHECK}</button>
         <button class="body" data-act="edit" data-kind="todo" data-id="${x.id}"><span class="title">${esc(x.title)}</span>${sub}</button>
@@ -307,13 +386,57 @@ function renderDay(){
     h += `<div class="empty">Энэ өдөр хийх зүйл алга. Доорх + товчоор нэмнэ.</div>`;
   }
   h += `</section>`;
+
+  // upcoming deadlines + exams
+  if (isToday){
+    const up = state.todos.filter(x => !x.done && x.date && x.date>k && dayDiff(t, fromKey(x.date)) <= (x.exam?30:7))
+      .sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:tmin(a.time)-tmin(b.time));
+    if (up.length){
+      h += `<section class="sec"><h2>Удахгүй <em>7 хоног · шалгалт 30 хоног</em></h2><div class="list">` + up.map(x => {
+        const d = fromKey(x.date), n = dayDiff(t, d);
+        return `<div class="row">
+          <button class="chk" data-act="todo" data-id="${x.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="false">${CHECK}</button>
+          <button class="body" data-act="edit" data-kind="todo" data-id="${x.id}"><span class="title">${esc(x.title)}</span>
+            <span class="sub">${todoTags(x)}${d.getMonth()+1}/${d.getDate()} ${DS[wd(d)]}${x.time?" "+esc(x.time):""}</span></button>
+          <span class="cd ${n<=2?"soon":""}">${n===1?"Маргааш":n+" хоног"}</span>
+        </div>`; }).join("") + `</div></section>`;
+    }
+  }
   if (syncNote) h += `<p class="sync">${esc(syncNote)}</p>`;
   app.innerHTML = h;
+}
+
+function gapRow(a,b){
+  return `<div class="row gap"><span class="gap-t">Чөлөөт цаг · ${fmtDur(b-a)}</span><span class="time">${fromMin(a)}–${fromMin(b)}</span></div>`;
+}
+
+function nowNextHTML(){
+  if (!state.blocks.length) return "";
+  const t = today(), now = new Date(), m = now.getHours()*60+now.getMinutes();
+  const bs = itemsFor(t).blocks;
+  const cur = bs.filter(b => m>=tmin(b.start) && m<tmin(b.end));
+  let nx = bs.find(b => tmin(b.start)>m), nxDay = 0;
+  if (!nx) for (let i=1;i<=7;i++){ const b = itemsFor(addDays(t,i)).blocks[0]; if (b){ nx=b; nxDay=i; break; } }
+  if (!cur.length && !nx) return "";
+  const stripe = b => `<span class="stripe" style="background:var(${(CATS[b.cat]||CATS.other).v})"></span>`;
+  const main = (lbl,b,extra="") => `<div class="nn-main"><span class="nn-lbl">${lbl}</span><span class="nn-t">${esc(b.title)}</span>${b.place?`<span class="sub">${esc(b.place)}</span>`:""}${extra}</div>`;
+  let h = `<section class="nn" aria-label="Одоо ба дараагийнх">`;
+  cur.forEach(b => {
+    const s0=tmin(b.start), e=tmin(b.end), p=Math.round((m-s0)/(e-s0)*100);
+    h += `<div class="nn-row">${stripe(b)}${main("Одоо",b,`<div class="nn-bar"><i style="width:${p}%"></i></div>`)}<div class="nn-when">${fmtDur(e-m)}<small>дуусахад</small></div></div>`;
+  });
+  if (nx){
+    const when = nxDay ? esc(nx.start) : fmtDur(tmin(nx.start)-m);
+    const small = nxDay ? (nxDay===1 ? "маргааш" : DAYS[wd(addDays(t,nxDay))]) : "дараа · "+esc(nx.start);
+    h += `<div class="nn-row">${stripe(nx)}${main("Дараагийнх",nx)}<div class="nn-when">${when}<small>${small}</small></div></div>`;
+  }
+  return h + `</section>`;
 }
 
 function renderWeek(){
   const t = wd(today());
   let h = `<h1 class="page-title">7 хоногийн хуваарь</h1><p class="hint">Хичээл, ажил, gym. Нэг удаа оруулахад долоо хоног бүр давтагдана.</p>`;
+  if (state.blocks.length) h += `<button class="cal-card" data-act="cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4M12 13v5M9.5 15.5h5"/></svg><div><b>iPhone Calendar-т нэмэх</b><span>Хичээл эхлэхээс өмнө утас чинь сануулна</span></div></button>`;
   if (!state.blocks.length){
     h += `<div class="empty">Одоохондоо хоосон байна.<br><button class="linkbtn" data-act="new" data-kind="block">Эхний хуваариа нэмэх</button></div>`;
   } else {
@@ -347,11 +470,129 @@ function renderRoutines(){
   app.innerHTML = h;
 }
 
+function renderStats(){
+  const t = today(), tk = key(t);
+  const mon = addDays(addDays(t,-wd(t)), statOff*7);
+  const days = [...Array(7)].map((_,i)=>addDays(mon,i));
+  const k0 = key(days[0]), k6 = key(days[6]);
+  let tot=0, dn=0, clsT=0, clsD=0;
+  const per = days.map(d => {
+    const fut = d>t, x = itemsFor(d);
+    if (!fut){
+      tot+=x.total; dn+=x.done;
+      const cb = x.blocks.filter(b=>b.cat==="class"); clsT+=cb.length; clsD+=cb.filter(b=>x.checked.has(b.id)).length;
+    }
+    return {d,fut,x};
+  });
+  const pct = tot ? Math.round(dn/tot*100) : 0;
+  const tdDone = state.todos.filter(x=>x.done && x.doneOn && x.doneOn>=k0 && x.doneOn<=k6).length;
+  const tdLate = state.todos.filter(x=>!x.done && x.date && x.date>=k0 && x.date<=k6 && x.date<tk).length;
+  const label = statOff===0 ? "Энэ долоо хоног" : statOff===-1 ? "Өнгөрсөн долоо хоног" : `${-statOff} долоо хоногийн өмнө`;
+  const md = d => `${d.getMonth()+1}/${d.getDate()}`;
+
+  let h = `<h1 class="page-title">Долоо хоногийн дүн</h1>
+  <div class="stat-nav"><button data-act="sw" data-n="-1" aria-label="Өмнөх долоо хоног">‹</button><span>${label} · ${md(days[0])}–${md(days[6])}</span><button data-act="sw" data-n="1" aria-label="Дараагийн долоо хоног" ${statOff>=0?"disabled":""}>›</button></div>`;
+
+  h += `<div class="card"><div class="hero-n">${tot?pct+"%":"–"}</div><div class="hero-s">${tot?`${dn}/${tot} зүйл хийсэн`:"Энэ долоо хоногт тэмдэглэсэн зүйл алга"}</div>
+  <div class="chart" role="img" aria-label="Өдөр бүрийн гүйцэтгэл">` + per.map(({d,fut,x},i) => {
+    const p = x.total ? x.done/x.total*100 : 0;
+    const tip = fut ? `${DAYS[i]}: удахгүй` : x.total ? `${DAYS[i]}: ${x.done}/${x.total} хийсэн` : `${DAYS[i]}: юу ч төлөвлөөгүй`;
+    return `<div class="bar ${+d===+t?"is-today":""}" title="${tip}"><div class="track ${fut?"fut":""}">${!fut&&x.done?`<i style="height:${Math.max(p,4)}%"></i>`:""}</div><small>${DS[i]}</small><small>${!fut&&x.total?`${x.done}/${x.total}`:"·"}</small></div>`;
+  }).join("") + `</div></div>`;
+
+  h += `<div class="tiles">
+    <div class="tile"><b>${clsT?`${clsD}/${clsT}`:"–"}</b><span>Хичээл суусан</span></div>
+    <div class="tile"><b>${tdDone}</b><span>Даалгавар хийсэн</span></div>
+    <div class="tile"><b${tdLate?' class="late"':""}>${tdLate}</b><span>Хоцорсон</span></div></div>`;
+
+  if (state.routines.length){
+    h += `<div class="card"><h3>Өдөр бүрийн зүйлс</h3>` + state.routines.slice().sort((a,b)=>tmin(a.time)-tmin(b.time)).map(r => {
+      let sch=0, ok=0;
+      const dots = days.map((d,i) => {
+        const on = (state.checks[key(d)]||[]).includes(r.id);
+        if (!r.days.includes(i)) return `<i class="na" title="${DS[i]}: товлоогүй"></i>`;
+        if (d>t) return `<i class="fut" title="${DS[i]}: удахгүй"></i>`;
+        sch++; if (on) ok++;
+        return `<i class="${on?"on":""}" title="${DS[i]}: ${on?"хийсэн":"хийгээгүй"}"></i>`;
+      }).join("");
+      return `<div class="rt"><div class="rt-h"><b>${esc(r.title)}</b><span>${ok}/${sch} өдөр</span></div><div class="dots">${dots}</div></div>`;
+    }).join("") + `<div class="legend"><span><i class="on"></i>хийсэн</span><span><i></i>хийгээгүй</span></div></div>`;
+  }
+  app.innerHTML = h;
+}
+
+/* ---------- calendar export (.ics) ---------- */
+const icsEsc = v => String(v).replace(/\\/g,"\\\\").replace(/;/g,"\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
+function icsFold(line){
+  const enc = new TextEncoder();
+  if (enc.encode(line).length <= 75) return line;
+  const out = []; let cur = "", n = 0;
+  for (const ch of line){ const b = enc.encode(ch).length; if (n+b > 74){ out.push(cur); cur = " "+ch; n = 1+b; } else { cur += ch; n += b; } }
+  out.push(cur); return out.join("\r\n");
+}
+function buildICS(f){
+  const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "Asia/Ulaanbaatar";
+  const off = -new Date().getTimezoneOffset();
+  const offS = (off>=0?"+":"-")+pad(Math.floor(Math.abs(off)/60))+pad(Math.abs(off)%60);
+  const ymd = d => d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+  const hm = v => v.replace(":","")+"00";
+  const utc = d => d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const t = today(), stamp = utc(new Date());
+  const until = fromKey(f.until); until.setHours(23,59,59);
+  const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Udur//Udur//MN","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Өдөр","X-WR-TIMEZONE:"+tz,
+    "BEGIN:VTIMEZONE","TZID:"+tz,"BEGIN:STANDARD","DTSTART:19700101T000000","TZOFFSETFROM:"+offS,"TZOFFSETTO:"+offS,"END:STANDARD","END:VTIMEZONE"];
+  const alarm = (title, trig) => ["BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+icsEsc(title),"TRIGGER:"+trig,"END:VALARM"];
+  let n = 0;
+  state.blocks.filter(b=>f.cats.includes(b.cat)).forEach(b => b.days.forEach(day => {
+    const first = addDays(t, (day - wd(t) + 7) % 7);
+    if (first > until) return;
+    n++;
+    L.push("BEGIN:VEVENT","UID:"+b.id+"-"+day+"@udur","DTSTAMP:"+stamp,
+      `DTSTART;TZID=${tz}:${ymd(first)}T${hm(b.start)}`, `DTEND;TZID=${tz}:${ymd(first)}T${hm(b.end)}`,
+      "RRULE:FREQ=WEEKLY;UNTIL="+utc(until), "SUMMARY:"+icsEsc(b.title));
+    if (b.place) L.push("LOCATION:"+icsEsc(b.place));
+    if (f.remind) L.push(...alarm(b.title, "-PT"+f.remind+"M"));
+    L.push("END:VEVENT");
+  }));
+  if (f.tasks){
+    state.todos.filter(x=>!x.done && x.date && x.date>=key(t) && (x.cls||x.exam)).forEach(x => {
+      n++;
+      const d = fromKey(x.date), title = (x.exam?"Шалгалт: ":"")+x.title+(x.cls?" ("+shortCls(x.cls)+")":"");
+      L.push("BEGIN:VEVENT","UID:"+x.id+"@udur","DTSTAMP:"+stamp,
+        "DTSTART;VALUE=DATE:"+ymd(d), "DTEND;VALUE=DATE:"+ymd(addDays(d,1)), "SUMMARY:"+icsEsc(title),
+        ...alarm(title, "-PT15H"), "END:VEVENT");   // 09:00 the day before
+    });
+  }
+  L.push("END:VCALENDAR");
+  return {text: L.map(icsFold).join("\r\n")+"\r\n", n};
+}
+function exportICS(viaShare){
+  readInputs();
+  const f = form, err = document.getElementById("f-err");
+  const {text, n} = buildICS(f);
+  if (!n){ err.textContent = "Нэмэх зүйл алга. Төрлөө сонгоно уу."; err.style.display="block"; return; }
+  const name = "udur-huvaar.ics";
+  if (viaShare && navigator.canShare){
+    const file = new File([text], name, {type:"text/calendar"});
+    if (navigator.canShare({files:[file]})){ navigator.share({files:[file]}).catch(()=>{}); return; }
+  }
+  const url = URL.createObjectURL(new Blob([text], {type:"text/calendar;charset=utf-8"}));
+  const a = document.createElement("a"); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+}
+
 /* ---------- sheet (add / edit) ---------- */
 const sheet = document.getElementById("sheet"), sheetIn = document.getElementById("sheetIn"), scrim = document.getElementById("scrim");
 let form = null;
 
-function openSheet(kind, id){
+function openSheet(kind, id, preset){
+  if (kind==="cal"){
+    const t = today(), m = t.getMonth();
+    const until = m>=8 ? new Date(t.getFullYear(),11,31) : m<=0 ? new Date(t.getFullYear(),0,31) : m<=5 ? new Date(t.getFullYear(),5,15) : addDays(t,112);
+    form = {kind:"cal", remind:10, cats:[...new Set(state.blocks.map(b=>b.cat))], until:key(until), tasks:true};
+    drawSheet(); scrim.classList.add("open"); sheet.classList.add("open"); return;
+  }
   let item = null;
   if (id){
     const src = kind==="block"?state.blocks:kind==="routine"?state.routines:state.todos;
@@ -365,7 +606,9 @@ function openSheet(kind, id){
     start: item?.start || "09:00", end: item?.end || "10:30", place: item?.place||"",
     time: item?.time||"",
     date: item ? (item.date||"") : key(sel),
-    nodate: item ? !item.date : false
+    nodate: item ? !item.date : false,
+    cls: item?.cls || preset?.cls || "",
+    exam: !!item?.exam
   };
   drawSheet();
   scrim.classList.add("open"); sheet.classList.add("open");
@@ -375,8 +618,21 @@ function closeSheet(){ sheet.classList.remove("open"); scrim.classList.remove("o
 
 function drawSheet(){
   const f = form, editing = !!f.id;
+  if (f.kind==="cal"){
+    const used = Object.entries(CATS).filter(([k])=>state.blocks.some(b=>b.cat===k));
+    sheetIn.innerHTML = `<div class="grab"></div><button class="x" data-act="close" aria-label="Хаах">×</button><h2 id="sheetTitle">iPhone Calendar-т нэмэх</h2>
+      <p class="hint" style="margin:-6px 0 16px">Хуваарь чинь Calendar-т долоо хоног бүр давтагдах үйл явдал болж орно. Ингэснээр апп хаалттай байсан ч утас чинь сануулна.</p>
+      <div class="field"><span class="lbl">Хэдэн минутын өмнө сануулах</span><div class="chips">${[[0,"Үгүй"],[5,"5"],[10,"10"],[15,"15"],[30,"30"]].map(([v,l])=>`<button class="chip" data-f="remind" data-v="${v}" aria-pressed="${f.remind===v}">${l}</button>`).join("")}</div></div>
+      <div class="field"><span class="lbl">Юуг оруулах</span><div class="chips">${used.map(([k,c])=>`<button class="chip cat" style="--cc:var(${c.v})" data-f="calcat" data-v="${k}" aria-pressed="${f.cats.includes(k)}">${c.n}</button>`).join("")}<button class="chip" data-f="caltasks" data-v="1" aria-pressed="${f.tasks}">Даалгавар, шалгалт</button></div></div>
+      <div class="field"><label for="f-until">Хэдий хүртэл давтах (улирал дуусах өдөр)</label><input class="inp" type="date" id="f-until" value="${esc(f.until)}"></div>
+      <p class="err" id="f-err"></p>
+      <div class="actions"><button class="btn primary" data-act="export">Calendar файл татах</button></div>
+      ${navigator.canShare ? `<div class="actions" style="margin-top:10px"><button class="btn" style="background:var(--soft)" data-act="exportshare">Share цэсээр нээх</button></div>` : ""}
+      <p class="note">Файл нээгдэхэд <b>Add All</b> (Бүгдийг нэмэх) дар. Шууд нээгдэхгүй бол Files апп → Downloads → udur-huvaar.ics дээр дар.<br>Хуваариа өөрчилбөл Calendar-аас хуучныг нь устгаад дахин нэмээрэй, тэгэхгүй бол давхардана.</p>`;
+    return;
+  }
   const titles = {todo:"Хийх зүйл", block:"Хуваарь", routine:"Өдөр бүрийн зүйл"};
-  let h = `<div class="grab"></div><h2 id="sheetTitle">${editing?"Засах":"Шинээр нэмэх"}</h2>`;
+  let h = `<div class="grab"></div><button class="x" data-act="close" aria-label="Хаах">×</button><h2 id="sheetTitle">${editing?"Засах":"Шинээр нэмэх"}</h2>`;
   if (!editing) h += `<div class="seg" role="group" aria-label="Төрөл">${["todo","block","routine"].map(k=>`<button data-f="kind" data-v="${k}" aria-pressed="${f.kind===k}">${titles[k]}</button>`).join("")}</div>`;
   const ph = {todo:"Жишээ нь: лаб 5-ын тайлан бичих", block:"Жишээ нь: Компьютерын сүлжээ", routine:"Жишээ нь: 2 литр ус уух"}[f.kind];
   h += `<div class="field"><label for="f-title">Нэр</label><input class="inp" id="f-title" value="${esc(f.title)}" placeholder="${ph}" autocomplete="off"></div><p class="err" id="f-err">Нэрээ бичнэ үү.</p>`;
@@ -386,6 +642,9 @@ function drawSheet(){
       <div class="field"><label for="f-date">Огноо</label><input class="inp" type="date" id="f-date" value="${esc(f.date)}" ${f.nodate?"disabled":""}></div>
       <div class="field"><label for="f-time">Цаг (заавал биш)</label><input class="inp" type="time" id="f-time" value="${esc(f.time)}"></div></div>
       <label class="check-line"><input type="checkbox" id="f-nodate" ${f.nodate?"checked":""}> Огноогүй, хийх хүртэл өнөөдрийн жагсаалтад байлгах</label>`;
+    const cl = classTitles();
+    if (cl.length) h += `<div class="field" style="margin-top:14px"><span class="lbl">Аль хичээлийнх (заавал биш)</span><div class="chips">${cl.map(c=>`<button class="chip" data-f="cls" data-v="${esc(c)}" aria-pressed="${f.cls===c}">${esc(c)}</button>`).join("")}</div></div>`;
+    h += `<label class="check-line"><input type="checkbox" id="f-exam" ${f.exam?"checked":""}> Шалгалт (30 хоногийн өмнөөс тоолж харуулна)</label>`;
   }
   if (f.kind==="block"){
     h += `<div class="field"><span class="lbl">Төрөл</span><div class="chips">${Object.entries(CATS).map(([k,c])=>`<button class="chip cat" style="--cc:var(${c.v})" data-f="cat" data-v="${k}" aria-pressed="${f.cat===k}">${c.n}</button>`).join("")}</div></div>`;
@@ -402,6 +661,10 @@ function drawSheet(){
   if (f.kind==="routine"){
     h += `<div class="field"><label for="f-time">Цаг (заавал биш)</label><input class="inp" type="time" id="f-time" value="${esc(f.time)}"></div>`;
   }
+  if (f.kind==="block" && editing && f.cat==="class"){
+    const orig = state.blocks.find(b=>b.id===f.id);
+    if (orig) h += `<button class="linkbtn" data-act="newtask" data-cls="${esc(orig.title)}">+ Энэ хичээлд даалгавар, шалгалт нэмэх</button>`;
+  }
   h += `<div class="actions">${editing?`<button class="btn danger" data-act="del">Устгах</button>`:""}<button class="btn primary" data-act="save">Хадгалах</button></div>`;
   sheetIn.innerHTML = h;
 }
@@ -414,6 +677,8 @@ function readInputs(){
   if (g("f-end")) form.end = g("f-end").value;
   if (g("f-place")) form.place = g("f-place").value;
   if (g("f-nodate")) form.nodate = g("f-nodate").checked;
+  if (g("f-exam")) form.exam = g("f-exam").checked;
+  if (g("f-until")) form.until = g("f-until").value;
 }
 function save(){
   readInputs();
@@ -425,7 +690,7 @@ function save(){
   let obj;
   if (f.kind==="todo"){
     const old = state.todos.find(x=>x.id===id);
-    obj = {id, title, date: f.nodate?null:(f.date||key(sel)), time:f.time||"", done: old?old.done:false, doneOn: old?old.doneOn:null};
+    obj = {id, title, date: f.nodate?null:(f.date||key(sel)), time:f.time||"", done: old?old.done:false, doneOn: old?old.doneOn:null, cls: f.cls||"", exam: !!f.exam};
     upsert(state.todos, obj);
   } else if (f.kind==="block"){
     obj = {id, title, cat:f.cat, days:f.days.slice().sort(), start:f.start, end:f.end, place:f.place.trim()};
@@ -455,6 +720,10 @@ document.addEventListener("click", e => {
     const v = fb.dataset.v;
     if (fb.dataset.f==="kind"){ form.kind=v; if(v==="routine") form.days=[0,1,2,3,4,5,6]; else if(v==="block") form.days=[wd(sel)]; }
     if (fb.dataset.f==="cat") form.cat=v;
+    if (fb.dataset.f==="cls") form.cls = form.cls===v ? "" : v;
+    if (fb.dataset.f==="remind") form.remind = +v;
+    if (fb.dataset.f==="calcat") form.cats = form.cats.includes(v) ? form.cats.filter(x=>x!==v) : [...form.cats, v];
+    if (fb.dataset.f==="caltasks") form.tasks = !form.tasks;
     if (fb.dataset.f==="day"){ const n=+v; form.days = form.days.includes(n)?form.days.filter(x=>x!==n):[...form.days,n]; }
     drawSheet(); return;
   }
@@ -476,11 +745,17 @@ document.addEventListener("click", e => {
   else if (act==="new") openSheet(a.dataset.kind);
   else if (act==="save") save();
   else if (act==="del") del();
+  else if (act==="cal") openSheet("cal");
+  else if (act==="close") closeSheet();
+  else if (act==="export") exportICS(false);
+  else if (act==="exportshare") exportICS(true);
+  else if (act==="newtask") openSheet("todo", null, {cls: a.dataset.cls});
+  else if (act==="sw"){ statOff = Math.min(0, statOff + +a.dataset.n); render(); }
 });
 document.addEventListener("change", e => { if (e.target.id==="f-nodate"){ readInputs(); drawSheet(); } });
 document.addEventListener("keydown", e => {
   if (e.key==="Escape" && form) closeSheet();
-  if (e.key==="Enter" && form && e.target.tagName==="INPUT" && e.target.type!=="checkbox") save();
+  if (e.key==="Enter" && form && form.kind!=="cal" && e.target.tagName==="INPUT" && e.target.type!=="checkbox") save();
 });
 document.getElementById("fab").addEventListener("click", () => openSheet(tab==="week"?"block":tab==="routines"?"routine":"todo"));
 scrim.addEventListener("click", closeSheet);
