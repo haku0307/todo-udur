@@ -172,7 +172,7 @@ const DS = ["Да","Мя","Лх","Пү","Ба","Бя","Ня"];
 const CATS = {class:{n:"Хичээл",v:"--c-class"},work:{n:"Ажил",v:"--c-work"},gym:{n:"Gym",v:"--c-gym"},other:{n:"Бусад",v:"--c-other"}};
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
-const blank = () => ({v:1, updatedAt:0, blocks:[], routines:[], todos:[], checks:{}});
+const blank = () => ({v:1, updatedAt:0, blocks:[], routines:[], todos:[], checks:{}, seeded:[]});
 let state = blank();
 try { const s = localStorage.getItem(KEY); if (s) state = Object.assign(blank(), JSON.parse(s)); } catch(e){}
 
@@ -489,6 +489,32 @@ scrim.addEventListener("click", closeSheet);
 let lastDay = key(today());
 setInterval(() => { const k=key(today()); if(k!==lastDay){ if(key(sel)===lastDay) sel=today(); lastDay=k; render(); } else if(tab==="day") render(); }, 60000);
 document.addEventListener("visibilitychange", () => { if(!document.hidden){ const k=key(today()); if(k!==lastDay){ if(key(sel)===lastDay) sel=today(); lastDay=k; } render(); } });
+
+/* ---------- one-time import: class schedule ---------- */
+(function seedClasses(){
+  const TAG = "classes-v1";
+  state.seeded = state.seeded || [];
+  if (state.seeded.includes(TAG)) return;
+  const C = [
+    ["ICSI253","Алгоритмын шинжилгээ зохиомж",0,"07:40","09:10","Хич-8, 301 тоот"],
+    ["ICSI204","Хиймэл оюун 1",0,"12:40","14:10","Хич-7, 107 тоот"],
+    ["ICSI204","Хиймэл оюун 1",0,"14:20","16:45","Хич-8, 406 тоот"],
+    ["ICSI303","Программ хангамжийн шаардлагын шинжилгээ",2,"09:20","10:50","Хич-7, 406 тоот"],
+    ["ECEN213","Компьютерын сүлжээ",2,"11:00","13:25","Хич-7, 401 тоот"],
+    ["ICSI303","Программ хангамжийн шаардлагын шинжилгээ",2,"14:20","15:50","Хич-8, 402 тоот"],
+    ["ECEN213","Компьютерын сүлжээ",2,"16:00","17:30","Хич-7, 209 тоот"],
+    ["ICSI253","Алгоритмын шинжилгээ зохиомж",3,"07:40","09:10","Хич-7, 207 тоот"],
+    ["CSII201","Программчлалын хэл",3,"11:00","12:30","Хич-7, 107 тоот"],
+    ["CSII201","Программчлалын хэл",3,"12:40","15:05","Хич-8, 208 тоот"]
+  ];
+  C.forEach(([code,name,day,start,end,place],i) => {
+    const id = "cls"+i;
+    if (!state.blocks.some(b=>b.id===id))
+      state.blocks.push({id, title:name, cat:"class", days:[day], start, end, place: place+", "+code});
+  });
+  state.seeded.push(TAG);
+  persist();
+})();
 
 render();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
