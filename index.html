@@ -130,8 +130,9 @@ button{cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .field{margin-bottom:14px}
 .field label,.field .lbl{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
-.inp{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;font-size:16px;min-height:46px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inp{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;display:block;text-align:left;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;font-size:16px;min-height:46px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.two>.field{min-width:0}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{border:1px solid var(--line);background:none;border-radius:10px;padding:8px 11px;font-size:14px;font-weight:500}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
@@ -200,6 +201,40 @@ button{cursor:pointer}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:10px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid var(--line);vertical-align:-1px;margin-right:4px}
 .legend i.on{background:var(--accent);border-color:var(--accent)}
+/* tap = tick, long-press = edit */
+.row[data-kind]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;transition:background .15s}
+.row[data-kind].press{background:var(--soft)}
+.tap-hint{font-size:12px;color:var(--muted);text-align:center;margin:-8px 0 0}
+/* split routines */
+.rbody{flex:1;min-width:0}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.step{border:1px solid var(--line);background:none;border-radius:999px;padding:4px 11px;font-size:13px;font-weight:500;color:var(--muted);min-height:30px}
+.step[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.row.part .chk{border-color:var(--accent)}
+.step-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.step-grid .inp{min-height:40px;padding:9px 11px;font-size:15px}
+/* routines tab */
+.rcard{display:block;width:100%;border:0;background:var(--surface);border-radius:16px;padding:14px;margin-bottom:10px;text-align:left}
+.rcard-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.rcard-h b{font-weight:600;overflow-wrap:anywhere}
+.streak{flex:0 0 auto;font-size:13px;font-weight:600;color:var(--c-work)}
+.rcard .sub{margin-top:2px}
+.wk-dots{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px;text-align:center}
+.wk-dots small{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.wk-dots i{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid var(--line)}
+.wk-dots i.on{background:var(--accent);border-color:var(--accent)}
+.wk-dots i.part{border-color:var(--accent);background:linear-gradient(to top,var(--accent) var(--p),transparent var(--p))}
+.wk-dots i.na{border-color:transparent;background:radial-gradient(circle,var(--line) 2px,transparent 3px)}
+.wk-dots i.fut{border-style:dashed;opacity:.6}
+.wk-dots .is-today small{color:var(--ink);font-weight:700}
+.sugg{display:flex;flex-wrap:wrap;gap:8px}
+.sugg button{border:1px dashed var(--line);background:none;border-radius:12px;padding:9px 12px;font-size:14px;font-weight:500;color:var(--ink);text-align:left}
+.sugg button small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+.dots i.part{border-color:var(--accent);background:linear-gradient(to top,var(--accent) var(--p),transparent var(--p))}
+/* undo toast */
+.toast{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:var(--bg);border-radius:14px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:14px;z-index:30;font-size:15px;width:max-content;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{border:0;background:var(--bg);color:var(--ink);border-radius:9px;padding:7px 12px;font-weight:600;font-size:14px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -259,6 +294,23 @@ function shortCls(title){
   return m ? m[0] : (title.length>18 ? title.slice(0,17)+"…" : title);
 }
 const todoTags = x => (x.exam?`<span class="tag exam">Шалгалт</span>`:"") + (x.cls?`<span class="tag cls">${esc(shortCls(x.cls))}</span>`:"");
+const hasSteps = r => Array.isArray(r.steps) && r.steps.length > 1;
+const stepId = (r,i) => r.id+"#"+i;
+const rCount = (r,k) => { const c = state.checks[k]||[]; return hasSteps(r) ? r.steps.filter((_,i)=>c.includes(stepId(r,i))).length : (c.includes(r.id)?1:0); };
+const rTotal = r => hasSteps(r) ? r.steps.length : 1;
+const rDone = (r,k) => rCount(r,k) === rTotal(r);
+const STEP_DEF = {2:["Өглөө","Орой"],3:["Өглөө","Өдөр","Орой"],4:["Өглөө","Өдөр","Үдээс хойш","Орой"],5:["Өглөө","Үд","Үдээс хойш","Орой","Унтахаас өмнө"],6:["1","2","3","4","5","6"],8:["1","2","3","4","5","6","7","8"]};
+const SUGG = [
+  {title:"Ус уух 2л", steps:STEP_DEF[4], unit:"500 мл", hint:"4 × 500 мл", re:/(water|ус)/i},
+  {title:"Сунгалт 10 мин", time:"07:30", hint:"өглөө бүр"},
+  {title:"Шүд угаах", steps:STEP_DEF[2], hint:"өглөө, орой", re:/шүд/i},
+  {title:"Витамин уух", time:"08:00", hint:"өглөөний цайтай"},
+  {title:"Давтлага хийх 30 мин", days:[0,1,2,3,4], time:"20:00", hint:"ажлын өдрүүдэд"},
+  {title:"Ном унших 20 мин", time:"22:00", hint:"унтахаас өмнө"},
+  {title:"Маргаашаа төлөвлөх", time:"22:30", hint:"5 минут"},
+  {title:"8000 алхам", hint:"өдөр бүр"},
+  {title:"Утсаа тавьж унтах", time:"23:30", hint:"цагтаа унтах"}
+];
 const daysLabel = arr => arr.length===7 ? "Өдөр бүр" : (arr.length===5 && [0,1,2,3,4].every(i=>arr.includes(i))) ? "Ажлын өдрүүд" : arr.slice().sort().map(i=>DS[i]).join(", ");
 
 /* ---------- storage + sync ---------- */
@@ -289,7 +341,7 @@ function itemsFor(d){
   const todos = state.todos.filter(t=>t.date===k).sort((a,b)=>(a.done-b.done)||tmin(a.time)-tmin(b.time));
   const checked = new Set(state.checks[k]||[]);
   const total = blocks.length+routines.length+todos.length;
-  const done = blocks.filter(b=>checked.has(b.id)).length + routines.filter(r=>checked.has(r.id)).length + todos.filter(t=>t.done).length;
+  const done = blocks.filter(b=>checked.has(b.id)).length + routines.filter(r=>rDone(r,k)).length + todos.filter(t=>t.done).length;
   return {blocks,routines,todos,checked,total,done};
 }
 
@@ -337,10 +389,10 @@ function renderDay(){
       const c = CATS[b.cat]||CATS.other, on = it.checked.has(b.id);
       const live = isToday && nowMin>=tmin(b.start) && nowMin<tmin(b.end);
       const hw = b.cat==="class" ? state.todos.filter(x=>!x.done && x.cls===b.title).length : 0;
-      return `<div class="row ${on?"done":""} ${live?"now":""}">
+      return `<div class="row ${on?"done":""} ${live?"now":""}" data-kind="block" data-id="${b.id}">
         <span class="stripe" style="background:var(${c.v})"></span>
         <button class="chk" data-act="tick" data-id="${b.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${on}">${CHECK}</button>
-        <button class="body" data-act="edit" data-kind="block" data-id="${b.id}">
+        <button class="body" data-act="tick" data-id="${b.id}">
           <span class="title">${esc(b.title)}</span>
           <span class="sub">${c.n}${b.place?", "+esc(b.place):""}${live?` <span class="now-tag">· одоо</span>`:""}${hw?` · <span class="hw">${hw} даалгавар</span>`:""}</span>
         </button>
@@ -355,10 +407,19 @@ function renderDay(){
   h += `<section class="sec"><h2>Өдөр бүр</h2>`;
   if (it.routines.length){
     h += `<div class="list">` + it.routines.map(r => {
-      const on = it.checked.has(r.id);
-      return `<div class="row ${on?"done":""}">
-        <button class="chk" data-act="tick" data-id="${r.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${on}">${CHECK}</button>
-        <button class="body" data-act="edit" data-kind="routine" data-id="${r.id}"><span class="title">${esc(r.title)}</span></button>
+      const n = rCount(r,k), tot = rTotal(r), on = n===tot;
+      if (!hasSteps(r)) return `<div class="row ${on?"done":""}" data-kind="routine" data-id="${r.id}">
+        <button class="chk" data-act="rtick" data-id="${r.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${on}">${CHECK}</button>
+        <button class="body" data-act="rtick" data-id="${r.id}"><span class="title">${esc(r.title)}</span>${r.unit?`<span class="sub">${esc(r.unit)}</span>`:""}</button>
+        ${r.time?`<span class="time">${esc(r.time)}</span>`:""}
+      </div>`;
+      const c = state.checks[k]||[];
+      return `<div class="row ${on?"done":n?"part":""}" data-kind="routine" data-id="${r.id}">
+        <button class="chk" data-act="rtick" data-id="${r.id}" aria-label="Бүгдийг хийсэн гэж тэмдэглэх" aria-pressed="${on}">${CHECK}</button>
+        <div class="rbody">
+          <button class="body" data-act="rnext" data-id="${r.id}"><span class="title">${esc(r.title)}</span><span class="sub">${n}/${tot}${r.unit?" · "+tot+" × "+esc(r.unit):""}</span></button>
+          <div class="steps">${r.steps.map((st,i)=>`<button class="step" data-act="rstep" data-id="${r.id}" data-i="${i}" aria-pressed="${c.includes(stepId(r,i))}">${esc(st)}</button>`).join("")}</div>
+        </div>
         ${r.time?`<span class="time">${esc(r.time)}</span>`:""}
       </div>`;}).join("") + `</div>`;
   } else {
@@ -377,9 +438,9 @@ function renderDay(){
       if (kind==="late"){ const d=fromKey(x.date); txt = `<span class="late">Хоцорсон, ${d.getMonth()+1}/${d.getDate()}</span>`; }
       else if (kind==="loose") txt = "Огноогүй";
       const tags = todoTags(x), sub = (tags||txt) ? `<span class="sub">${tags}${txt}</span>` : "";
-      return `<div class="row ${x.done?"done":""}">
+      return `<div class="row ${x.done?"done":""}" data-kind="todo" data-id="${x.id}">
         <button class="chk" data-act="todo" data-id="${x.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${x.done}">${CHECK}</button>
-        <button class="body" data-act="edit" data-kind="todo" data-id="${x.id}"><span class="title">${esc(x.title)}</span>${sub}</button>
+        <button class="body" data-act="todo" data-id="${x.id}"><span class="title">${esc(x.title)}</span>${sub}</button>
         ${x.time?`<span class="time">${esc(x.time)}</span>`:""}
       </div>`;}).join("") + `</div>`;
   } else {
@@ -394,14 +455,15 @@ function renderDay(){
     if (up.length){
       h += `<section class="sec"><h2>Удахгүй <em>7 хоног · шалгалт 30 хоног</em></h2><div class="list">` + up.map(x => {
         const d = fromKey(x.date), n = dayDiff(t, d);
-        return `<div class="row">
+        return `<div class="row" data-kind="todo" data-id="${x.id}">
           <button class="chk" data-act="todo" data-id="${x.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="false">${CHECK}</button>
-          <button class="body" data-act="edit" data-kind="todo" data-id="${x.id}"><span class="title">${esc(x.title)}</span>
+          <button class="body" data-act="todo" data-id="${x.id}"><span class="title">${esc(x.title)}</span>
             <span class="sub">${todoTags(x)}${d.getMonth()+1}/${d.getDate()} ${DS[wd(d)]}${x.time?" "+esc(x.time):""}</span></button>
           <span class="cd ${n<=2?"soon":""}">${n===1?"Маргааш":n+" хоног"}</span>
         </div>`; }).join("") + `</div></section>`;
     }
   }
+  h += `<p class="tap-hint">Дарвал тэмдэглэнэ · удаан дарвал засна</p>`;
   if (syncNote) h += `<p class="sync">${esc(syncNote)}</p>`;
   app.innerHTML = h;
 }
@@ -453,20 +515,44 @@ function renderWeek(){
   app.innerHTML = h;
 }
 
+function streaks(r){
+  let cur = 0, best = 0, run = 0, open = true, d = today();
+  if (!rDone(r,key(d))) d = addDays(d,-1);   // an unfinished today doesn't break the streak
+  for (let n=0; n<90; n++, d=addDays(d,-1)){
+    if (!r.days.includes(wd(d))) continue;
+    if (rDone(r,key(d))){ run++; if (open) cur = run; }
+    else { open = false; run = 0; }
+    best = Math.max(best, run);
+  }
+  return {cur, best};
+}
+
 function renderRoutines(){
   let h = `<h1 class="page-title">Өдөр бүрийн зүйлс</h1><p class="hint">Сонгосон өдрүүдэд автоматаар жагсаалтад гарна. Шөнө дунд дахин шинэчлэгдэнэ.</p>`;
+  const t = today(), mon = addDays(t, -wd(t));
   if (!state.routines.length){
-    h += `<div class="empty">Жишээ нь: ус 2 литр, 20 минут ном унших, сунгалт.<br><button class="linkbtn" data-act="new" data-kind="routine">Нэмэх</button></div>`;
+    h += `<div class="empty">Доорх жишээнүүдээс сонгох эсвэл + товчоор өөрөө нэмээрэй.</div>`;
   } else {
-    // streak for each routine
-    h += `<div class="list">` + state.routines.slice().sort((a,b)=>tmin(a.time)-tmin(b.time)).map(r => {
-      let streak=0, d=today();
-      if (!(state.checks[key(d)]||[]).includes(r.id)) d=addDays(d,-1);
-      for (let n=0;n<90;n++){ if(!r.days.includes(wd(d))){ d=addDays(d,-1); continue; } if((state.checks[key(d)]||[]).includes(r.id)){ streak++; d=addDays(d,-1);} else break; }
-      return `<div class="row"><button class="body" data-act="edit" data-kind="routine" data-id="${r.id}">
-        <span class="title">${esc(r.title)}</span><span class="sub">${daysLabel(r.days)}${r.time?", "+esc(r.time):""}${streak?` · ${streak} удаа дараалан`:""}</span></button></div>`;
-    }).join("") + `</div>`;
+    h += state.routines.slice().sort((a,b)=>tmin(a.time)-tmin(b.time)).map(r => {
+      const {cur, best} = streaks(r);
+      const dots = [...Array(7)].map((_,i) => {
+        const d = addDays(mon,i), kk = key(d), isT = +d===+t;
+        let cls = "", st = "";
+        if (!r.days.includes(i)) cls = "na";
+        else if (d > t) cls = "fut";
+        else { const n = rCount(r,kk), tot = rTotal(r); cls = n===tot ? "on" : n ? "part" : ""; if (cls==="part") st = ` style="--p:${Math.round(n/tot*100)}%"`; }
+        return `<span class="${isT?"is-today":""}"><small>${DS[i]}</small><i class="${cls}"${st}></i></span>`;
+      }).join("");
+      const meta = [daysLabel(r.days), r.time, hasSteps(r) ? r.steps.length+" хэсэг"+(r.unit?" × "+r.unit:"") : r.unit].filter(Boolean).map(esc).join(" · ");
+      return `<button class="rcard" data-act="edit" data-kind="routine" data-id="${r.id}">
+        <div class="rcard-h"><b>${esc(r.title)}</b>${cur?`<span class="streak">${cur} өдөр дараалан</span>`:""}</div>
+        <span class="sub">${meta}${best>1?` · дээд амжилт ${best}`:""}</span>
+        <div class="wk-dots">${dots}</div></button>`;
+    }).join("");
   }
+  const have = new Set(state.routines.map(r=>r.title.toLowerCase()));
+  const sg = SUGG.map((x,i)=>[x,i]).filter(([x])=>!have.has(x.title.toLowerCase()) && !(x.re && state.routines.some(r=>x.re.test(r.title))));
+  if (sg.length) h += `<section class="sec" style="margin-top:22px"><h2>Санал болгох</h2><div class="sugg">${sg.map(([x,i])=>`<button data-act="sugg" data-i="${i}">+ ${esc(x.title)}<small>${esc(x.hint)}</small></button>`).join("")}</div></section>`;
   app.innerHTML = h;
 }
 
@@ -509,10 +595,11 @@ function renderStats(){
     h += `<div class="card"><h3>Өдөр бүрийн зүйлс</h3>` + state.routines.slice().sort((a,b)=>tmin(a.time)-tmin(b.time)).map(r => {
       let sch=0, ok=0;
       const dots = days.map((d,i) => {
-        const on = (state.checks[key(d)]||[]).includes(r.id);
+        const n = rCount(r,key(d)), tot = rTotal(r), on = n===tot;
         if (!r.days.includes(i)) return `<i class="na" title="${DS[i]}: товлоогүй"></i>`;
         if (d>t) return `<i class="fut" title="${DS[i]}: удахгүй"></i>`;
         sch++; if (on) ok++;
+        if (!on && n) return `<i class="part" style="--p:${Math.round(n/tot*100)}%" title="${DS[i]}: ${n}/${tot}"></i>`;
         return `<i class="${on?"on":""}" title="${DS[i]}: ${on?"хийсэн":"хийгээгүй"}"></i>`;
       }).join("");
       return `<div class="rt"><div class="rt-h"><b>${esc(r.title)}</b><span>${ok}/${sch} өдөр</span></div><div class="dots">${dots}</div></div>`;
@@ -600,11 +687,13 @@ function openSheet(kind, id, preset){
   }
   form = {
     kind, id: id||null,
-    title: item?.title||"",
+    title: item?.title || preset?.title || "",
     cat: item?.cat || (kind==="block"?"class":"other"),
-    days: item?.days ? [...item.days] : (kind==="routine" ? [0,1,2,3,4,5,6] : [wd(sel)]),
+    days: item?.days ? [...item.days] : preset?.days ? [...preset.days] : (kind==="routine" ? [0,1,2,3,4,5,6] : [wd(sel)]),
     start: item?.start || "09:00", end: item?.end || "10:30", place: item?.place||"",
-    time: item?.time||"",
+    time: item?.time || preset?.time || "",
+    steps: item?.steps ? [...item.steps] : preset?.steps ? [...preset.steps] : [],
+    unit: item?.unit || preset?.unit || "",
     date: item ? (item.date||"") : key(sel),
     nodate: item ? !item.date : false,
     cls: item?.cls || preset?.cls || "",
@@ -659,7 +748,11 @@ function drawSheet(){
       <div class="field"><label for="f-place">Байршил (заавал биш)</label><input class="inp" id="f-place" value="${esc(f.place)}" placeholder="Жишээ нь: 1-р байр 304" autocomplete="off"></div>`;
   }
   if (f.kind==="routine"){
-    h += `<div class="field"><label for="f-time">Цаг (заавал биш)</label><input class="inp" type="time" id="f-time" value="${esc(f.time)}"></div>`;
+    const n = f.steps.length > 1 ? f.steps.length : 1;
+    h += `<div class="field"><label for="f-time">Цаг (заавал биш)</label><input class="inp" type="time" id="f-time" value="${esc(f.time)}"></div>
+    <div class="field"><span class="lbl">Өдөрт хэд хуваах (жишээ нь 2л усыг 4 × 500 мл)</span><div class="chips">${[1,2,3,4,5,6,8].map(v=>`<button class="chip" data-f="nsteps" data-v="${v}" aria-pressed="${n===v}">${v===1?"Нэг удаа":v}</button>`).join("")}</div></div>`;
+    if (n > 1) h += `<div class="field"><span class="lbl">Хэсгүүдийн нэр</span><div class="step-grid">${f.steps.map((st,i)=>`<input class="inp" id="f-step-${i}" value="${esc(st)}" aria-label="${i+1}-р хэсэг" autocomplete="off">`).join("")}</div></div>
+      <div class="field"><label for="f-unit">Нэг удаад (заавал биш)</label><input class="inp" id="f-unit" value="${esc(f.unit)}" placeholder="Жишээ нь: 500 мл" autocomplete="off"></div>`;
   }
   if (f.kind==="block" && editing && f.cat==="class"){
     const orig = state.blocks.find(b=>b.id===f.id);
@@ -678,6 +771,8 @@ function readInputs(){
   if (g("f-place")) form.place = g("f-place").value;
   if (g("f-nodate")) form.nodate = g("f-nodate").checked;
   if (g("f-exam")) form.exam = g("f-exam").checked;
+  if (g("f-unit")) form.unit = g("f-unit").value;
+  form.steps && form.steps.forEach((_,i) => { const el = g("f-step-"+i); if (el) form.steps[i] = el.value; });
   if (g("f-until")) form.until = g("f-until").value;
 }
 function save(){
@@ -697,6 +792,7 @@ function save(){
     upsert(state.blocks, obj);
   } else {
     obj = {id, title, days:f.days.slice().sort(), time:f.time||""};
+    if (f.steps.length > 1){ obj.steps = f.steps.map((st,i)=>st.trim()||String(i+1)); obj.unit = f.unit.trim(); }
     upsert(state.routines, obj);
   }
   persist(); closeSheet(); render();
@@ -706,7 +802,7 @@ function del(){
   const f=form;
   const name = f.kind==="block"?"blocks":f.kind==="routine"?"routines":"todos";
   state[name] = state[name].filter(x=>x.id!==f.id);
-  for (const k in state.checks) state.checks[k] = state.checks[k].filter(i=>i!==f.id);
+  for (const k in state.checks) state.checks[k] = state.checks[k].filter(i=>i!==f.id && !i.startsWith(f.id+"#"));
   persist(); closeSheet(); render();
 }
 
@@ -721,6 +817,7 @@ document.addEventListener("click", e => {
     if (fb.dataset.f==="kind"){ form.kind=v; if(v==="routine") form.days=[0,1,2,3,4,5,6]; else if(v==="block") form.days=[wd(sel)]; }
     if (fb.dataset.f==="cat") form.cat=v;
     if (fb.dataset.f==="cls") form.cls = form.cls===v ? "" : v;
+    if (fb.dataset.f==="nsteps"){ const n = +v; form.steps = n>1 ? (STEP_DEF[n]||[...Array(n)].map((_,i)=>String(i+1))).slice() : []; }
     if (fb.dataset.f==="remind") form.remind = +v;
     if (fb.dataset.f==="calcat") form.cats = form.cats.includes(v) ? form.cats.filter(x=>x!==v) : [...form.cats, v];
     if (fb.dataset.f==="caltasks") form.tasks = !form.tasks;
@@ -738,9 +835,25 @@ document.addEventListener("click", e => {
   }
   else if (act==="todo"){
     const x=state.todos.find(t=>t.id===a.dataset.id); if(!x) return;
+    const prev = {done:x.done, doneOn:x.doneOn};
     x.done=!x.done; x.doneOn = x.done ? key(today()) : null;
     persist(); render();
+    if (x.done) toast(`«${x.title}» хийсэн`, () => { Object.assign(x, prev); persist(); render(); });
   }
+  else if (act==="rtick" || act==="rnext" || act==="rstep"){
+    const r = state.routines.find(z=>z.id===a.dataset.id); if (!r) return;
+    const k = key(sel); let arr = state.checks[k]||[];
+    if (!hasSteps(r)) arr = arr.includes(r.id) ? arr.filter(x=>x!==r.id) : [...arr, r.id];
+    else {
+      const ids = r.steps.map((_,i)=>stepId(r,i)), have = ids.filter(x=>arr.includes(x));
+      if (act==="rstep"){ const s = stepId(r,+a.dataset.i); arr = arr.includes(s) ? arr.filter(x=>x!==s) : [...arr, s]; }
+      else if (act==="rtick") arr = have.length===ids.length ? arr.filter(x=>!ids.includes(x)) : [...arr.filter(x=>!ids.includes(x)), ...ids];
+      else { const nx = ids.find(x=>!arr.includes(x)); arr = nx ? [...arr, nx] : arr.filter(x=>x!==have[have.length-1]); }   // tap name = next portion
+    }
+    state.checks[k] = arr; persist(); render();
+  }
+  else if (act==="sugg"){ const x = SUGG[+a.dataset.i]; openSheet("routine", null, {...x, steps: x.steps ? [...x.steps] : undefined}); }
+  else if (act==="undo"){ const fn = undoFn; hideToast(); if (fn) fn(); }
   else if (act==="edit") openSheet(a.dataset.kind, a.dataset.id);
   else if (act==="new") openSheet(a.dataset.kind);
   else if (act==="save") save();
@@ -759,6 +872,40 @@ document.addEventListener("keydown", e => {
 });
 document.getElementById("fab").addEventListener("click", () => openSheet(tab==="week"?"block":tab==="routines"?"routine":"todo"));
 scrim.addEventListener("click", closeSheet);
+
+/* ---------- long-press a row on the Day tab to edit it ---------- */
+let lp = null, lpFired = false;
+const cancelLP = () => { if (lp){ clearTimeout(lp.t); lp.row.classList.remove("press"); lp = null; } };
+app.addEventListener("pointerdown", e => {
+  lpFired = false;
+  const row = e.target.closest(".row[data-kind]"); if (!row || tab!=="day") return;
+  cancelLP();
+  lp = {row, x:e.clientX, y:e.clientY, t:setTimeout(() => {
+    lpFired = true; row.classList.remove("press"); lp = null;
+    if (navigator.vibrate) navigator.vibrate(15);
+    openSheet(row.dataset.kind, row.dataset.id);
+  }, 450)};
+  setTimeout(() => { if (lp && lp.row===row) row.classList.add("press"); }, 120);
+});
+app.addEventListener("pointermove", e => { if (lp && Math.hypot(e.clientX-lp.x, e.clientY-lp.y) > 10) cancelLP(); });
+["pointerup","pointercancel","scroll"].forEach(ev => window.addEventListener(ev, cancelLP, {passive:true}));
+app.addEventListener("contextmenu", e => {
+  const row = e.target.closest(".row[data-kind]"); if (!row || tab!=="day") return;
+  e.preventDefault();
+  if (!lpFired){ cancelLP(); openSheet(row.dataset.kind, row.dataset.id); }
+});
+// swallow the click that follows a long-press so it doesn't tick the row or close the sheet
+document.addEventListener("click", e => { if (lpFired){ lpFired = false; e.stopPropagation(); e.preventDefault(); } }, true);
+
+/* ---------- undo toast ---------- */
+let undoFn = null, toastT = null;
+const toastEl = document.createElement("div"); toastEl.className = "toast"; toastEl.setAttribute("role","status"); document.body.appendChild(toastEl);
+function toast(msg, undo){
+  undoFn = undo || null;
+  toastEl.innerHTML = `<span>${esc(msg)}</span>${undo?`<button data-act="undo">Буцаах</button>`:""}`;
+  toastEl.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(hideToast, 4500);
+}
+function hideToast(){ toastEl.classList.remove("show"); undoFn = null; }
 
 // keep "today" fresh if the app stays open past midnight
 let lastDay = key(today());
@@ -789,6 +936,15 @@ document.addEventListener("visibilitychange", () => { if(!document.hidden){ cons
   });
   state.seeded.push(TAG);
   persist();
+})();
+
+/* ---------- one-time: split "2l water" into 4 × 500 ml ---------- */
+(function splitWater(){
+  const TAG = "water-split-v1";
+  if (state.seeded.includes(TAG)) return;
+  state.routines.forEach(r => { if (!hasSteps(r) && /2\s*(l|л)/i.test(r.title) && /(water|ус)/i.test(r.title)){ r.steps = STEP_DEF[4].slice(); r.unit = "500 мл";
+    for (const k in state.checks) if (state.checks[k].includes(r.id)) state.checks[k] = [...state.checks[k].filter(x=>x!==r.id), ...r.steps.map((_,i)=>stepId(r,i))]; } });
+  state.seeded.push(TAG); persist();
 })();
 
 render();
