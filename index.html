@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Өдөр</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Өдөр">
+<meta name="theme-color" content="#EEF2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1522" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F7; --surface:#FFFFFF; --ink:#172033; --muted:#5E6B82; --line:#D9E0EA; --soft:#E3E9F2;
+  --accent:#2747D6; --on-accent:#FFFFFF;
+  --c-class:#2747D6; --c-work:#B86F00; --c-gym:#D23C4E; --c-other:#12877A;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1522; --surface:#18202F; --ink:#E8EDF6; --muted:#94A0B6; --line:#2A3447; --soft:#212B3D;
+    --accent:#7C95FF; --on-accent:#0F1522;
+    --c-class:#7C95FF; --c-work:#F0B24A; --c-gym:#FF7383; --c-other:#3CC7B5;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1522; --surface:#18202F; --ink:#E8EDF6; --muted:#94A0B6; --line:#2A3447; --soft:#212B3D;
+  --accent:#7C95FF; --on-accent:#0F1522;
+  --c-class:#7C95FF; --c-work:#F0B24A; --c-gym:#FF7383; --c-other:#3CC7B5;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px; line-height:1.45; -webkit-tap-highlight-color:transparent;
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 140px}
+
+/* header */
+.day-head{padding:6px 2px 14px}
+.day-name{font-family:"Unbounded","Golos Text",sans-serif;font-weight:700;font-size:clamp(34px,10vw,46px);line-height:1.05;letter-spacing:-.01em;margin:0}
+.day-meta{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;color:var(--muted)}
+.day-meta b{color:var(--ink);font-weight:600}
+.band{height:6px;background:var(--soft);border-radius:3px;margin-top:12px;overflow:hidden}
+.band i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .35s ease}
+
+/* week strip */
+.week{display:flex;align-items:center;gap:4px;margin:4px 0 22px}
+.wk-arrow{flex:0 0 32px;height:56px;border:0;background:none;color:var(--muted);font-size:20px;border-radius:10px}
+.days{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.d{border:1px solid transparent;background:var(--surface);border-radius:12px;padding:7px 0 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px}
+.d small{font-size:11px;color:var(--muted)}
+.d span{font-weight:600;font-size:16px}
+.d .dot{width:5px;height:5px;border-radius:50%;background:transparent;margin-top:2px}
+.d.has .dot{background:var(--muted)}
+.d.full .dot{background:var(--accent)}
+.d.today{border-color:var(--accent)}
+.d.sel{background:var(--accent);color:var(--on-accent)}
+.d.sel small{color:inherit;opacity:.8}
+.d.sel .dot{background:var(--on-accent)}
+
+/* sections */
+.sec{margin-bottom:24px}
+.sec h2{font-size:15px;font-weight:600;color:var(--muted);margin:0 0 8px 2px;display:flex;justify-content:space-between}
+.sec h2 em{font-style:normal;font-weight:500}
+.list{background:var(--surface);border-radius:16px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);min-height:56px}
+.row:first-child{border-top:0}
+.chk{flex:0 0 26px;height:26px;border-radius:50%;border:2px solid var(--line);background:none;display:grid;place-items:center;padding:0}
+.chk svg{width:14px;height:14px;opacity:0;transition:opacity .15s}
+.row.done .chk{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.row.done .chk svg{opacity:1}
+.row.done .title{text-decoration:line-through;color:var(--muted)}
+.body{flex:1;min-width:0;border:0;background:none;text-align:left;padding:0}
+.title{display:block;font-weight:500;overflow-wrap:anywhere}
+.sub{display:block;font-size:13px;color:var(--muted)}
+.time{flex:0 0 auto;font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);text-align:right;line-height:1.25}
+.stripe{flex:0 0 4px;align-self:stretch;border-radius:2px;margin:-2px 0}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:1px 7px;border-radius:6px;margin-right:6px;vertical-align:1px}
+.row.now{background:var(--soft)}
+.now-tag{font-size:12px;font-weight:600;color:var(--accent)}
+.late{color:var(--c-gym);font-weight:600}
+.empty{background:var(--surface);border-radius:16px;padding:16px;color:var(--muted);font-size:15px}
+.empty button{margin-top:10px}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;padding:0}
+
+/* week tab */
+.wday{margin-bottom:16px}
+.wday h3{font-family:"Unbounded",sans-serif;font-weight:500;font-size:15px;margin:0 0 6px 2px}
+.wday h3.is-today{color:var(--accent)}
+.page-title{font-family:"Unbounded","Golos Text",sans-serif;font-weight:700;font-size:28px;margin:6px 2px 18px;line-height:1.15}
+.hint{color:var(--muted);font-size:14px;margin:-10px 2px 18px}
+
+/* tabbar + fab */
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+.tabbar-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.tab{border:0;background:none;padding:10px 0 12px;font-size:13px;font-weight:500;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{color:var(--accent)}
+.fab{position:fixed;right:max(18px,calc(50% - 262px));bottom:calc(76px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:18px;border:0;background:var(--accent);color:var(--on-accent);font-size:30px;line-height:1;z-index:21;box-shadow:0 6px 18px rgba(39,71,214,.35)}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,15,30,.45);z-index:40;display:none}
+.scrim.open{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-radius:22px 22px 0 0;max-height:88vh;overflow:auto;transform:translateY(105%);transition:transform .25s ease;padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet.open{transform:none}
+.sheet-in{max-width:560px;margin:0 auto}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+.sheet h2{font-family:"Unbounded",sans-serif;font-weight:500;font-size:19px;margin:0 0 14px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--soft);border-radius:12px;padding:3px;margin-bottom:16px}
+.seg button{border:0;background:none;border-radius:9px;padding:9px 4px;font-size:14px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.field{margin-bottom:14px}
+.field label,.field .lbl{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+.inp{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;font-size:16px;min-height:46px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:none;border-radius:10px;padding:8px 11px;font-size:14px;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip.cat[aria-pressed="true"]{background:var(--cc);border-color:var(--cc);color:#fff}
+.check-line{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);margin-top:8px}
+.actions{display:flex;gap:10px;margin-top:20px}
+.btn{flex:1;border:0;border-radius:14px;padding:14px;font-weight:600;font-size:16px}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.danger{flex:0 0 auto;background:none;color:var(--c-gym);border:1px solid var(--line)}
+.err{color:var(--c-gym);font-size:14px;margin-top:-6px;margin-bottom:10px;display:none}
+.sync{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app"></main>
+
+<button class="fab" id="fab" aria-label="Шинээр нэмэх">+</button>
+
+<nav class="tabbar" aria-label="Цэс">
+  <div class="tabbar-in">
+    <button class="tab" data-tab="day" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Өдөр</button>
+    <button class="tab" data-tab="week">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Хуваарь</button>
+    <button class="tab" data-tab="routines">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>Өдөр бүр</button>
+  </div>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="sheet-in" id="sheetIn"></div></div>
+
+<script>
+(() => {
+const KEY = "udur-app-v1";
+const DAYS = ["Даваа","Мягмар","Лхагва","Пүрэв","Баасан","Бямба","Ням"];
+const DS = ["Да","Мя","Лх","Пү","Ба","Бя","Ня"];
+const CATS = {class:{n:"Хичээл",v:"--c-class"},work:{n:"Ажил",v:"--c-work"},gym:{n:"Gym",v:"--c-gym"},other:{n:"Бусад",v:"--c-other"}};
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+const blank = () => ({v:1, updatedAt:0, blocks:[], routines:[], todos:[], checks:{}});
+let state = blank();
+try { const s = localStorage.getItem(KEY); if (s) state = Object.assign(blank(), JSON.parse(s)); } catch(e){}
+
+let tab = "day";
+let sel = new Date(); sel.setHours(0,0,0,0);
+
+/* ---------- helpers ---------- */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const pad = n => String(n).padStart(2,"0");
+const key = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const wd = d => (d.getDay()+6)%7;
+const today = () => { const t=new Date(); t.setHours(0,0,0,0); return t; };
+const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+const fromKey = k => { const [y,m,dd]=k.split("-").map(Number); return new Date(y,m-1,dd); };
+const tmin = t => { if(!t) return 9999; const [h,m]=t.split(":").map(Number); return h*60+m; };
+const daysLabel = arr => arr.length===7 ? "Өдөр бүр" : (arr.length===5 && [0,1,2,3,4].every(i=>arr.includes(i))) ? "Ажлын өдрүүд" : arr.slice().sort().map(i=>DS[i]).join(", ");
+
+/* ---------- storage + sync ---------- */
+let ref=null, writing=false, pending=false, timer=null, syncNote="";
+function persist(){
+  state.updatedAt = Date.now();
+  // keep checks for 90 days
+  const cutoff = key(addDays(today(),-90));
+  for (const k of Object.keys(state.checks)) if (k < cutoff) delete state.checks[k];
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+  if (ref){ clearTimeout(timer); timer = setTimeout(flush, 700); }
+}
+async function flush(){
+  if (!ref) return;
+  if (writing){ pending = true; return; }
+  writing = true;
+  try { await ref.set(JSON.parse(JSON.stringify(state))); syncNote=""; }
+  catch(e){ syncNote = "Сервер рүү хадгалж чадсангүй, энэ утсан дээр хадгалагдсан."; }
+  writing = false;
+  if (pending){ pending=false; flush(); }
+}
+
+/* ---------- day computations ---------- */
+function itemsFor(d){
+  const w = wd(d), k = key(d);
+  const blocks = state.blocks.filter(b=>b.days.includes(w)).sort((a,b)=>tmin(a.start)-tmin(b.start));
+  const routines = state.routines.filter(r=>r.days.includes(w)).sort((a,b)=>tmin(a.time)-tmin(b.time));
+  const todos = state.todos.filter(t=>t.date===k).sort((a,b)=>(a.done-b.done)||tmin(a.time)-tmin(b.time));
+  const checked = new Set(state.checks[k]||[]);
+  const total = blocks.length+routines.length+todos.length;
+  const done = blocks.filter(b=>checked.has(b.id)).length + routines.filter(r=>checked.has(r.id)).length + todos.filter(t=>t.done).length;
+  return {blocks,routines,todos,checked,total,done};
+}
+
+/* ---------- render ---------- */
+const app = document.getElementById("app");
+function render(){
+  document.querySelectorAll(".tab").forEach(b => b.toggleAttribute("aria-current", false) || (b.dataset.tab===tab && b.setAttribute("aria-current","page")));
+  if (tab==="day") renderDay(); else if (tab==="week") renderWeek(); else renderRoutines();
+}
+
+function renderDay(){
+  const t = today(), isToday = +sel===+t;
+  const it = itemsFor(sel), k = key(sel);
+  const pct = it.total ? Math.round(it.done/it.total*100) : 0;
+  const mon = addDays(sel, -wd(sel));
+  const now = new Date(), nowMin = now.getHours()*60+now.getMinutes();
+
+  let h = `<header class="day-head">
+    <h1 class="day-name">${DAYS[wd(sel)]}</h1>
+    <div class="day-meta"><span>${sel.getMonth()+1}-р сарын ${sel.getDate()}${isToday?", өнөөдөр":""}</span>
+    <span>${it.total ? `<b>${it.done}/${it.total}</b> хийсэн` : ""}</span></div>
+    <div class="band" aria-hidden="true"><i style="width:${pct}%"></i></div>
+  </header>
+  <div class="week">
+    <button class="wk-arrow" data-act="wk" data-n="-7" aria-label="Өмнөх 7 хоног">‹</button>
+    <div class="days">`;
+  for (let i=0;i<7;i++){
+    const d = addDays(mon,i), x = itemsFor(d);
+    const cls = ["d", +d===+sel?"sel":"", +d===+t?"today":"", x.total?"has":"", x.total&&x.done===x.total?"full":""].join(" ");
+    h += `<button class="${cls}" data-act="pick" data-k="${key(d)}" aria-label="${DAYS[i]} ${d.getDate()}"><small>${DS[i]}</small><span>${d.getDate()}</span><i class="dot"></i></button>`;
+  }
+  h += `</div><button class="wk-arrow" data-act="wk" data-n="7" aria-label="Дараагийн 7 хоног">›</button></div>`;
+
+  // schedule
+  h += `<section class="sec"><h2>Хуваарь</h2>`;
+  if (it.blocks.length){
+    h += `<div class="list">` + it.blocks.map(b => {
+      const c = CATS[b.cat]||CATS.other, on = it.checked.has(b.id);
+      const live = isToday && nowMin>=tmin(b.start) && nowMin<tmin(b.end);
+      return `<div class="row ${on?"done":""} ${live?"now":""}">
+        <span class="stripe" style="background:var(${c.v})"></span>
+        <button class="chk" data-act="tick" data-id="${b.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${on}">${CHECK}</button>
+        <button class="body" data-act="edit" data-kind="block" data-id="${b.id}">
+          <span class="title">${esc(b.title)}</span>
+          <span class="sub">${c.n}${b.place?", "+esc(b.place):""}${live?` <span class="now-tag">· одоо</span>`:""}</span>
+        </button>
+        <span class="time">${esc(b.start)}<br>${esc(b.end)}</span>
+      </div>`;}).join("") + `</div>`;
+  } else {
+    h += `<div class="empty">${state.blocks.length ? "Энэ өдөр хичээл, ажил, gym алга." : "Хичээл, ажил, gym-ийн цагаа нэг удаа оруулчихвал өдөр бүр энд гарч ирнэ."}${state.blocks.length?"":`<br><button class="linkbtn" data-act="new" data-kind="block">Хуваарь нэмэх</button>`}</div>`;
+  }
+  h += `</section>`;
+
+  // routines
+  h += `<section class="sec"><h2>Өдөр бүр</h2>`;
+  if (it.routines.length){
+    h += `<div class="list">` + it.routines.map(r => {
+      const on = it.checked.has(r.id);
+      return `<div class="row ${on?"done":""}">
+        <button class="chk" data-act="tick" data-id="${r.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${on}">${CHECK}</button>
+        <button class="body" data-act="edit" data-kind="routine" data-id="${r.id}"><span class="title">${esc(r.title)}</span></button>
+        ${r.time?`<span class="time">${esc(r.time)}</span>`:""}
+      </div>`;}).join("") + `</div>`;
+  } else {
+    h += `<div class="empty">Ус уух, сунгалт хийх гэх мэт өдөр бүр давтдаг зүйлсээ нэмээрэй.<br><button class="linkbtn" data-act="new" data-kind="routine">Давтагдах зүйл нэмэх</button></div>`;
+  }
+  h += `</section>`;
+
+  // todos
+  const late = isToday ? state.todos.filter(x=>x.date && x.date<k && !x.done).sort((a,b)=>a.date<b.date?-1:1) : [];
+  const loose = isToday ? state.todos.filter(x=>!x.date && (!x.done || x.doneOn===k)) : [];
+  const all = [...late.map(x=>[x,"late"]), ...it.todos.map(x=>[x,""]), ...loose.map(x=>[x,"loose"])];
+  h += `<section class="sec"><h2>Хийх зүйлс</h2>`;
+  if (all.length){
+    h += `<div class="list">` + all.map(([x,kind]) => {
+      let sub = "";
+      if (kind==="late"){ const d=fromKey(x.date); sub = `<span class="sub late">Хоцорсон, ${d.getMonth()+1}/${d.getDate()}</span>`; }
+      else if (kind==="loose") sub = `<span class="sub">Огноогүй</span>`;
+      return `<div class="row ${x.done?"done":""}">
+        <button class="chk" data-act="todo" data-id="${x.id}" aria-label="Хийсэн гэж тэмдэглэх" aria-pressed="${x.done}">${CHECK}</button>
+        <button class="body" data-act="edit" data-kind="todo" data-id="${x.id}"><span class="title">${esc(x.title)}</span>${sub}</button>
+        ${x.time?`<span class="time">${esc(x.time)}</span>`:""}
+      </div>`;}).join("") + `</div>`;
+  } else {
+    h += `<div class="empty">Энэ өдөр хийх зүйл алга. Доорх + товчоор нэмнэ.</div>`;
+  }
+  h += `</section>`;
+  if (syncNote) h += `<p class="sync">${esc(syncNote)}</p>`;
+  app.innerHTML = h;
+}
+
+function renderWeek(){
+  const t = wd(today());
+  let h = `<h1 class="page-title">7 хоногийн хуваарь</h1><p class="hint">Хичээл, ажил, gym. Нэг удаа оруулахад долоо хоног бүр давтагдана.</p>`;
+  if (!state.blocks.length){
+    h += `<div class="empty">Одоохондоо хоосон байна.<br><button class="linkbtn" data-act="new" data-kind="block">Эхний хуваариа нэмэх</button></div>`;
+  } else {
+    for (let i=0;i<7;i++){
+      const bs = state.blocks.filter(b=>b.days.includes(i)).sort((a,b)=>tmin(a.start)-tmin(b.start));
+      h += `<div class="wday"><h3 class="${i===t?"is-today":""}">${DAYS[i]}</h3>`;
+      if (!bs.length){ h += `<div class="empty" style="padding:12px 14px">Чөлөөтэй</div></div>`; continue; }
+      h += `<div class="list">` + bs.map(b => { const c=CATS[b.cat]||CATS.other; return `<div class="row">
+        <span class="stripe" style="background:var(${c.v})"></span>
+        <button class="body" data-act="edit" data-kind="block" data-id="${b.id}"><span class="title">${esc(b.title)}</span><span class="sub">${c.n}${b.place?", "+esc(b.place):""}</span></button>
+        <span class="time">${esc(b.start)}–${esc(b.end)}</span></div>`; }).join("") + `</div></div>`;
+    }
+  }
+  app.innerHTML = h;
+}
+
+function renderRoutines(){
+  let h = `<h1 class="page-title">Өдөр бүрийн зүйлс</h1><p class="hint">Сонгосон өдрүүдэд автоматаар жагсаалтад гарна. Шөнө дунд дахин шинэчлэгдэнэ.</p>`;
+  if (!state.routines.length){
+    h += `<div class="empty">Жишээ нь: ус 2 литр, 20 минут ном унших, сунгалт.<br><button class="linkbtn" data-act="new" data-kind="routine">Нэмэх</button></div>`;
+  } else {
+    // streak for each routine
+    h += `<div class="list">` + state.routines.slice().sort((a,b)=>tmin(a.time)-tmin(b.time)).map(r => {
+      let streak=0, d=today();
+      if (!(state.checks[key(d)]||[]).includes(r.id)) d=addDays(d,-1);
+      for (let n=0;n<90;n++){ if(!r.days.includes(wd(d))){ d=addDays(d,-1); continue; } if((state.checks[key(d)]||[]).includes(r.id)){ streak++; d=addDays(d,-1);} else break; }
+      return `<div class="row"><button class="body" data-act="edit" data-kind="routine" data-id="${r.id}">
+        <span class="title">${esc(r.title)}</span><span class="sub">${daysLabel(r.days)}${r.time?", "+esc(r.time):""}${streak?` · ${streak} удаа дараалан`:""}</span></button></div>`;
+    }).join("") + `</div>`;
+  }
+  app.innerHTML = h;
+}
+
+/* ---------- sheet (add / edit) ---------- */
+const sheet = document.getElementById("sheet"), sheetIn = document.getElementById("sheetIn"), scrim = document.getElementById("scrim");
+let form = null;
+
+function openSheet(kind, id){
+  let item = null;
+  if (id){
+    const src = kind==="block"?state.blocks:kind==="routine"?state.routines:state.todos;
+    item = src.find(x=>x.id===id);
+  }
+  form = {
+    kind, id: id||null,
+    title: item?.title||"",
+    cat: item?.cat || (kind==="block"?"class":"other"),
+    days: item?.days ? [...item.days] : (kind==="routine" ? [0,1,2,3,4,5,6] : [wd(sel)]),
+    start: item?.start || "09:00", end: item?.end || "10:30", place: item?.place||"",
+    time: item?.time||"",
+    date: item ? (item.date||"") : key(sel),
+    nodate: item ? !item.date : false
+  };
+  drawSheet();
+  scrim.classList.add("open"); sheet.classList.add("open");
+  setTimeout(()=>{ const i=document.getElementById("f-title"); if(i && !id) i.focus(); }, 260);
+}
+function closeSheet(){ sheet.classList.remove("open"); scrim.classList.remove("open"); form=null; }
+
+function drawSheet(){
+  const f = form, editing = !!f.id;
+  const titles = {todo:"Хийх зүйл", block:"Хуваарь", routine:"Өдөр бүрийн зүйл"};
+  let h = `<div class="grab"></div><h2 id="sheetTitle">${editing?"Засах":"Шинээр нэмэх"}</h2>`;
+  if (!editing) h += `<div class="seg" role="group" aria-label="Төрөл">${["todo","block","routine"].map(k=>`<button data-f="kind" data-v="${k}" aria-pressed="${f.kind===k}">${titles[k]}</button>`).join("")}</div>`;
+  const ph = {todo:"Жишээ нь: лаб 5-ын тайлан бичих", block:"Жишээ нь: Компьютерын сүлжээ", routine:"Жишээ нь: 2 литр ус уух"}[f.kind];
+  h += `<div class="field"><label for="f-title">Нэр</label><input class="inp" id="f-title" value="${esc(f.title)}" placeholder="${ph}" autocomplete="off"></div><p class="err" id="f-err">Нэрээ бичнэ үү.</p>`;
+
+  if (f.kind==="todo"){
+    h += `<div class="two">
+      <div class="field"><label for="f-date">Огноо</label><input class="inp" type="date" id="f-date" value="${esc(f.date)}" ${f.nodate?"disabled":""}></div>
+      <div class="field"><label for="f-time">Цаг (заавал биш)</label><input class="inp" type="time" id="f-time" value="${esc(f.time)}"></div></div>
+      <label class="check-line"><input type="checkbox" id="f-nodate" ${f.nodate?"checked":""}> Огноогүй, хийх хүртэл өнөөдрийн жагсаалтад байлгах</label>`;
+  }
+  if (f.kind==="block"){
+    h += `<div class="field"><span class="lbl">Төрөл</span><div class="chips">${Object.entries(CATS).map(([k,c])=>`<button class="chip cat" style="--cc:var(${c.v})" data-f="cat" data-v="${k}" aria-pressed="${f.cat===k}">${c.n}</button>`).join("")}</div></div>`;
+  }
+  if (f.kind!=="todo"){
+    h += `<div class="field"><span class="lbl">Өдрүүд</span><div class="chips">${DS.map((d,i)=>`<button class="chip" data-f="day" data-v="${i}" aria-pressed="${f.days.includes(i)}">${d}</button>`).join("")}</div></div>`;
+  }
+  if (f.kind==="block"){
+    h += `<div class="two">
+      <div class="field"><label for="f-start">Эхлэх</label><input class="inp" type="time" id="f-start" value="${esc(f.start)}"></div>
+      <div class="field"><label for="f-end">Дуусах</label><input class="inp" type="time" id="f-end" value="${esc(f.end)}"></div></div>
+      <div class="field"><label for="f-place">Байршил (заавал биш)</label><input class="inp" id="f-place" value="${esc(f.place)}" placeholder="Жишээ нь: 1-р байр 304" autocomplete="off"></div>`;
+  }
+  if (f.kind==="routine"){
+    h += `<div class="field"><label for="f-time">Цаг (заавал биш)</label><input class="inp" type="time" id="f-time" value="${esc(f.time)}"></div>`;
+  }
+  h += `<div class="actions">${editing?`<button class="btn danger" data-act="del">Устгах</button>`:""}<button class="btn primary" data-act="save">Хадгалах</button></div>`;
+  sheetIn.innerHTML = h;
+}
+function readInputs(){
+  const g = id => document.getElementById(id);
+  if (g("f-title")) form.title = g("f-title").value;
+  if (g("f-date")) form.date = g("f-date").value;
+  if (g("f-time")) form.time = g("f-time").value;
+  if (g("f-start")) form.start = g("f-start").value;
+  if (g("f-end")) form.end = g("f-end").value;
+  if (g("f-place")) form.place = g("f-place").value;
+  if (g("f-nodate")) form.nodate = g("f-nodate").checked;
+}
+function save(){
+  readInputs();
+  const f = form, title = f.title.trim(), err = document.getElementById("f-err");
+  if (!title){ err.textContent="Нэрээ бичнэ үү."; err.style.display="block"; return; }
+  if (f.kind!=="todo" && !f.days.length){ err.textContent="Дор хаяж нэг өдөр сонгоно уу."; err.style.display="block"; return; }
+  if (f.kind==="block" && tmin(f.end)<=tmin(f.start)){ err.textContent="Дуусах цаг эхлэх цагаас хойш байх ёстой."; err.style.display="block"; return; }
+  const id = f.id || uid();
+  let obj;
+  if (f.kind==="todo"){
+    const old = state.todos.find(x=>x.id===id);
+    obj = {id, title, date: f.nodate?null:(f.date||key(sel)), time:f.time||"", done: old?old.done:false, doneOn: old?old.doneOn:null};
+    upsert(state.todos, obj);
+  } else if (f.kind==="block"){
+    obj = {id, title, cat:f.cat, days:f.days.slice().sort(), start:f.start, end:f.end, place:f.place.trim()};
+    upsert(state.blocks, obj);
+  } else {
+    obj = {id, title, days:f.days.slice().sort(), time:f.time||""};
+    upsert(state.routines, obj);
+  }
+  persist(); closeSheet(); render();
+}
+function upsert(arr,obj){ const i=arr.findIndex(x=>x.id===obj.id); if(i>=0) arr[i]=obj; else arr.push(obj); }
+function del(){
+  const f=form;
+  const name = f.kind==="block"?"blocks":f.kind==="routine"?"routines":"todos";
+  state[name] = state[name].filter(x=>x.id!==f.id);
+  for (const k in state.checks) state.checks[k] = state.checks[k].filter(i=>i!==f.id);
+  persist(); closeSheet(); render();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const tb = e.target.closest(".tab");
+  if (tb){ tab = tb.dataset.tab; render(); window.scrollTo(0,0); return; }
+  const fb = e.target.closest("[data-f]");
+  if (fb && form){
+    readInputs();
+    const v = fb.dataset.v;
+    if (fb.dataset.f==="kind"){ form.kind=v; if(v==="routine") form.days=[0,1,2,3,4,5,6]; else if(v==="block") form.days=[wd(sel)]; }
+    if (fb.dataset.f==="cat") form.cat=v;
+    if (fb.dataset.f==="day"){ const n=+v; form.days = form.days.includes(n)?form.days.filter(x=>x!==n):[...form.days,n]; }
+    drawSheet(); return;
+  }
+  const a = e.target.closest("[data-act]"); if (!a) return;
+  const act = a.dataset.act;
+  if (act==="pick"){ sel = fromKey(a.dataset.k); render(); }
+  else if (act==="wk"){ sel = addDays(sel, +a.dataset.n); render(); }
+  else if (act==="tick"){
+    const k=key(sel), arr=state.checks[k]||[], id=a.dataset.id;
+    state.checks[k] = arr.includes(id) ? arr.filter(x=>x!==id) : [...arr,id];
+    persist(); render();
+  }
+  else if (act==="todo"){
+    const x=state.todos.find(t=>t.id===a.dataset.id); if(!x) return;
+    x.done=!x.done; x.doneOn = x.done ? key(today()) : null;
+    persist(); render();
+  }
+  else if (act==="edit") openSheet(a.dataset.kind, a.dataset.id);
+  else if (act==="new") openSheet(a.dataset.kind);
+  else if (act==="save") save();
+  else if (act==="del") del();
+});
+document.addEventListener("change", e => { if (e.target.id==="f-nodate"){ readInputs(); drawSheet(); } });
+document.addEventListener("keydown", e => {
+  if (e.key==="Escape" && form) closeSheet();
+  if (e.key==="Enter" && form && e.target.tagName==="INPUT" && e.target.type!=="checkbox") save();
+});
+document.getElementById("fab").addEventListener("click", () => openSheet(tab==="week"?"block":tab==="routines"?"routine":"todo"));
+scrim.addEventListener("click", closeSheet);
+
+// keep "today" fresh if the app stays open past midnight
+let lastDay = key(today());
+setInterval(() => { const k=key(today()); if(k!==lastDay){ if(key(sel)===lastDay) sel=today(); lastDay=k; render(); } else if(tab==="day") render(); }, 60000);
+document.addEventListener("visibilitychange", () => { if(!document.hidden){ const k=key(today()); if(k!==lastDay){ if(key(sel)===lastDay) sel=today(); lastDay=k; } render(); } });
+
+render();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+})();
+</script>
+</body>
+</html>
