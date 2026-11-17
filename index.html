@@ -209,9 +209,10 @@ button{cursor:pointer}
 .rbody{flex:1;min-width:0}
 .steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
 .step{border:1px solid var(--line);background:none;border-radius:999px;padding:4px 11px;font-size:13px;font-weight:500;color:var(--muted);min-height:30px}
+.step small{font-size:11px;opacity:.75;margin-left:4px;font-variant-numeric:tabular-nums}
 .step[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .row.part .chk{border-color:var(--accent)}
-.step-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.step-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px}
 .step-grid .inp{min-height:40px;padding:9px 11px;font-size:15px}
 /* routines tab */
 .rcard{display:block;width:100%;border:0;background:var(--surface);border-radius:16px;padding:14px;margin-bottom:10px;text-align:left}
@@ -300,10 +301,13 @@ const rCount = (r,k) => { const c = state.checks[k]||[]; return hasSteps(r) ? r.
 const rTotal = r => hasSteps(r) ? r.steps.length : 1;
 const rDone = (r,k) => rCount(r,k) === rTotal(r);
 const STEP_DEF = {2:["Өглөө","Орой"],3:["Өглөө","Өдөр","Орой"],4:["Өглөө","Өдөр","Үдээс хойш","Орой"],5:["Өглөө","Үд","Үдээс хойш","Орой","Унтахаас өмнө"],6:["1","2","3","4","5","6"],8:["1","2","3","4","5","6","7","8"]};
+const STEP_TIMES = {2:["08:00","21:30"],3:["08:00","13:00","19:00"],4:["08:00","12:00","15:00","19:00"],5:["08:00","11:00","14:00","18:00","22:00"]};
+const defTimes = n => (STEP_TIMES[n] || [...Array(n)].map(()=>"")).slice();
 const SUGG = [
-  {title:"Ус уух 2л", steps:STEP_DEF[4], unit:"500 мл", hint:"4 × 500 мл", re:/(water|ус)/i},
+  {title:"Ус уух 2л", steps:STEP_DEF[4], stepTimes:STEP_TIMES[4], unit:"500 мл", hint:"4 × 500 мл", re:/(water|ус)/i},
+  {title:"Креатин 5 г", time:"09:00", hint:"өдөр бүр", re:/(creat|креат)/i},
   {title:"Сунгалт 10 мин", time:"07:30", hint:"өглөө бүр"},
-  {title:"Шүд угаах", steps:STEP_DEF[2], hint:"өглөө, орой", re:/шүд/i},
+  {title:"Шүд угаах", steps:STEP_DEF[2], stepTimes:STEP_TIMES[2], hint:"өглөө, орой", re:/шүд/i},
   {title:"Витамин уух", time:"08:00", hint:"өглөөний цайтай"},
   {title:"Давтлага хийх 30 мин", days:[0,1,2,3,4], time:"20:00", hint:"ажлын өдрүүдэд"},
   {title:"Ном унших 20 мин", time:"22:00", hint:"унтахаас өмнө"},
@@ -418,7 +422,7 @@ function renderDay(){
         <button class="chk" data-act="rtick" data-id="${r.id}" aria-label="Бүгдийг хийсэн гэж тэмдэглэх" aria-pressed="${on}">${CHECK}</button>
         <div class="rbody">
           <button class="body" data-act="rnext" data-id="${r.id}"><span class="title">${esc(r.title)}</span><span class="sub">${n}/${tot}${r.unit?" · "+tot+" × "+esc(r.unit):""}</span></button>
-          <div class="steps">${r.steps.map((st,i)=>`<button class="step" data-act="rstep" data-id="${r.id}" data-i="${i}" aria-pressed="${c.includes(stepId(r,i))}">${esc(st)}</button>`).join("")}</div>
+          <div class="steps">${r.steps.map((st,i)=>`<button class="step" data-act="rstep" data-id="${r.id}" data-i="${i}" aria-pressed="${c.includes(stepId(r,i))}">${esc(st)}${r.stepTimes?.[i]?`<small>${esc(r.stepTimes[i])}</small>`:""}</button>`).join("")}</div>
         </div>
         ${r.time?`<span class="time">${esc(r.time)}</span>`:""}
       </div>`;}).join("") + `</div>`;
@@ -530,6 +534,7 @@ function streaks(r){
 function renderRoutines(){
   let h = `<h1 class="page-title">Өдөр бүрийн зүйлс</h1><p class="hint">Сонгосон өдрүүдэд автоматаар жагсаалтад гарна. Шөнө дунд дахин шинэчлэгдэнэ.</p>`;
   const t = today(), mon = addDays(t, -wd(t));
+  if (state.routines.length) h += `<button class="cal-card" data-act="calr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><div><b>Lock screen дээр сануулга авах</b><span>Цагт нь «Ус уух · Өглөө» гэх мэтээр мэдэгдэл ирнэ</span></div></button>`;
   if (!state.routines.length){
     h += `<div class="empty">Доорх жишээнүүдээс сонгох эсвэл + товчоор өөрөө нэмээрэй.</div>`;
   } else {
@@ -641,6 +646,23 @@ function buildICS(f){
     if (f.remind) L.push(...alarm(b.title, "-PT"+f.remind+"M"));
     L.push("END:VEVENT");
   }));
+  if (f.routines){
+    const BY = ["MO","TU","WE","TH","FR","SA","SU"];
+    state.routines.forEach(r => {
+      if (!r.days.length) return;
+      const first = [...Array(7)].map((_,i)=>addDays(t,i)).find(d=>r.days.includes(wd(d)));
+      const slots = hasSteps(r) ? r.steps.map((st,i)=>[i, r.stepTimes?.[i], `${r.title} · ${st}${r.unit?" ("+r.unit+")":""}`]) : [[null, r.time, r.title+(r.unit?" ("+r.unit+")":"")]];
+      slots.forEach(([i, tm, title]) => {
+        if (!tm) return;
+        n++;
+        const endM = Math.min(tmin(tm)+10, 23*60+59);
+        L.push("BEGIN:VEVENT","UID:"+r.id+(i===null?"":"-s"+i)+"-r@udur","DTSTAMP:"+stamp,
+          `DTSTART;TZID=${tz}:${ymd(first)}T${hm(tm)}`, `DTEND;TZID=${tz}:${ymd(first)}T${hm(fromMin(endM))}`,
+          "RRULE:FREQ=WEEKLY;BYDAY="+r.days.slice().sort().map(d=>BY[d]).join(","), "SUMMARY:"+icsEsc(title),
+          "TRANSP:TRANSPARENT", ...alarm(title, "PT0M"), "END:VEVENT");
+      });
+    });
+  }
   if (f.tasks){
     state.todos.filter(x=>!x.done && x.date && x.date>=key(t) && (x.cls||x.exam)).forEach(x => {
       n++;
@@ -658,7 +680,7 @@ function exportICS(viaShare){
   const f = form, err = document.getElementById("f-err");
   const {text, n} = buildICS(f);
   if (!n){ err.textContent = "Нэмэх зүйл алга. Төрлөө сонгоно уу."; err.style.display="block"; return; }
-  const name = "udur-huvaar.ics";
+  const name = f.only ? "udur-sanuulga.ics" : "udur-huvaar.ics";
   if (viaShare && navigator.canShare){
     const file = new File([text], name, {type:"text/calendar"});
     if (navigator.canShare({files:[file]})){ navigator.share({files:[file]}).catch(()=>{}); return; }
@@ -675,9 +697,10 @@ let form = null;
 
 function openSheet(kind, id, preset){
   if (kind==="cal"){
+    const only = preset?.only==="routines";
     const t = today(), m = t.getMonth();
     const until = m>=8 ? new Date(t.getFullYear(),11,31) : m<=0 ? new Date(t.getFullYear(),0,31) : m<=5 ? new Date(t.getFullYear(),5,15) : addDays(t,112);
-    form = {kind:"cal", remind:10, cats:[...new Set(state.blocks.map(b=>b.cat))], until:key(until), tasks:true};
+    form = {kind:"cal", only, remind:10, cats: only ? [] : [...new Set(state.blocks.map(b=>b.cat))], until:key(until), tasks:!only, routines:true};
     drawSheet(); scrim.classList.add("open"); sheet.classList.add("open"); return;
   }
   let item = null;
@@ -693,6 +716,7 @@ function openSheet(kind, id, preset){
     start: item?.start || "09:00", end: item?.end || "10:30", place: item?.place||"",
     time: item?.time || preset?.time || "",
     steps: item?.steps ? [...item.steps] : preset?.steps ? [...preset.steps] : [],
+    stepTimes: item?.stepTimes ? [...item.stepTimes] : preset?.stepTimes ? [...preset.stepTimes] : [],
     unit: item?.unit || preset?.unit || "",
     date: item ? (item.date||"") : key(sel),
     nodate: item ? !item.date : false,
@@ -709,10 +733,23 @@ function drawSheet(){
   const f = form, editing = !!f.id;
   if (f.kind==="cal"){
     const used = Object.entries(CATS).filter(([k])=>state.blocks.some(b=>b.cat===k));
+    const timed = state.routines.filter(r => hasSteps(r) ? (r.stepTimes||[]).some(Boolean) : r.time);
+    const untimed = state.routines.filter(r => !timed.includes(r));
+    if (f.only){
+      sheetIn.innerHTML = `<div class="grab"></div><button class="x" data-act="close" aria-label="Хаах">×</button><h2 id="sheetTitle">Lock screen сануулга</h2>
+      <p class="hint" style="margin:-6px 0 16px">Өдөр бүрийн зүйлс чинь iPhone Calendar-т орж, цагт нь lock screen дээр мэдэгдэл ирнэ. Апп хаалттай байсан ч ажиллана.</p>
+      <div class="list" style="margin-bottom:14px;background:var(--bg)">${timed.map(r=>`<div class="row" style="min-height:48px"><span class="body"><span class="title">${esc(r.title)}</span><span class="sub">${hasSteps(r) ? r.steps.map((st,i)=>r.stepTimes?.[i]?esc(st)+" "+esc(r.stepTimes[i]):"").filter(Boolean).join(" · ") : esc(r.time)}</span></span></div>`).join("") || `<div class="row"><span class="sub">Цагтай зүйл алга.</span></div>`}</div>
+      ${untimed.length?`<p class="note" style="margin:0 0 14px">Цаг тохируулаагүй тул сануулахгүй: ${untimed.map(r=>esc(r.title)).join(", ")}. Засах цонхонд нь цаг оруулаарай.</p>`:""}
+      <p class="err" id="f-err"></p>
+      <div class="actions"><button class="btn primary" data-act="export">Calendar-т нэмэх</button></div>
+      ${navigator.canShare ? `<div class="actions" style="margin-top:10px"><button class="btn" style="background:var(--soft)" data-act="exportshare">Share цэсээр нээх</button></div>` : ""}
+      <p class="note">Файл нээгдэхэд <b>Add All</b> (Бүгдийг нэмэх) дар. Мэдэгдэл ирэхгүй бол Settings → Notifications → Calendar → Allow Notifications асаалттай эсэхийг шалга.<br>Цаг өөрчилбөл Calendar-аас хуучныг нь устгаад дахин нэмээрэй, тэгэхгүй бол давхардана.</p>`;
+      return;
+    }
     sheetIn.innerHTML = `<div class="grab"></div><button class="x" data-act="close" aria-label="Хаах">×</button><h2 id="sheetTitle">iPhone Calendar-т нэмэх</h2>
       <p class="hint" style="margin:-6px 0 16px">Хуваарь чинь Calendar-т долоо хоног бүр давтагдах үйл явдал болж орно. Ингэснээр апп хаалттай байсан ч утас чинь сануулна.</p>
       <div class="field"><span class="lbl">Хэдэн минутын өмнө сануулах</span><div class="chips">${[[0,"Үгүй"],[5,"5"],[10,"10"],[15,"15"],[30,"30"]].map(([v,l])=>`<button class="chip" data-f="remind" data-v="${v}" aria-pressed="${f.remind===v}">${l}</button>`).join("")}</div></div>
-      <div class="field"><span class="lbl">Юуг оруулах</span><div class="chips">${used.map(([k,c])=>`<button class="chip cat" style="--cc:var(${c.v})" data-f="calcat" data-v="${k}" aria-pressed="${f.cats.includes(k)}">${c.n}</button>`).join("")}<button class="chip" data-f="caltasks" data-v="1" aria-pressed="${f.tasks}">Даалгавар, шалгалт</button></div></div>
+      <div class="field"><span class="lbl">Юуг оруулах</span><div class="chips">${used.map(([k,c])=>`<button class="chip cat" style="--cc:var(${c.v})" data-f="calcat" data-v="${k}" aria-pressed="${f.cats.includes(k)}">${c.n}</button>`).join("")}<button class="chip" data-f="caltasks" data-v="1" aria-pressed="${f.tasks}">Даалгавар, шалгалт</button>${timed.length?`<button class="chip" data-f="calroutines" data-v="1" aria-pressed="${f.routines}">Өдөр бүрийн зүйлс</button>`:""}</div></div>
       <div class="field"><label for="f-until">Хэдий хүртэл давтах (улирал дуусах өдөр)</label><input class="inp" type="date" id="f-until" value="${esc(f.until)}"></div>
       <p class="err" id="f-err"></p>
       <div class="actions"><button class="btn primary" data-act="export">Calendar файл татах</button></div>
@@ -749,9 +786,9 @@ function drawSheet(){
   }
   if (f.kind==="routine"){
     const n = f.steps.length > 1 ? f.steps.length : 1;
-    h += `<div class="field"><label for="f-time">Цаг (заавал биш)</label><input class="inp" type="time" id="f-time" value="${esc(f.time)}"></div>
-    <div class="field"><span class="lbl">Өдөрт хэд хуваах (жишээ нь 2л усыг 4 × 500 мл)</span><div class="chips">${[1,2,3,4,5,6,8].map(v=>`<button class="chip" data-f="nsteps" data-v="${v}" aria-pressed="${n===v}">${v===1?"Нэг удаа":v}</button>`).join("")}</div></div>`;
-    if (n > 1) h += `<div class="field"><span class="lbl">Хэсгүүдийн нэр</span><div class="step-grid">${f.steps.map((st,i)=>`<input class="inp" id="f-step-${i}" value="${esc(st)}" aria-label="${i+1}-р хэсэг" autocomplete="off">`).join("")}</div></div>
+    if (n===1) h += `<div class="field"><label for="f-time">Цаг (сануулга авах бол заавал)</label><input class="inp" type="time" id="f-time" value="${esc(f.time)}"></div>`;
+    h += `<div class="field"><span class="lbl">Өдөрт хэд хуваах (жишээ нь 2л усыг 4 × 500 мл)</span><div class="chips">${[1,2,3,4,5,6,8].map(v=>`<button class="chip" data-f="nsteps" data-v="${v}" aria-pressed="${n===v}">${v===1?"Нэг удаа":v}</button>`).join("")}</div></div>`;
+    if (n > 1) h += `<div class="field"><span class="lbl">Хэсэг бүрийн нэр ба сануулах цаг</span><div class="step-grid">${f.steps.map((st,i)=>`<input class="inp" id="f-step-${i}" value="${esc(st)}" aria-label="${i+1}-р хэсгийн нэр" autocomplete="off"><input class="inp" type="time" id="f-steptime-${i}" value="${esc(f.stepTimes[i]||"")}" aria-label="${i+1}-р хэсгийн цаг">`).join("")}</div></div>
       <div class="field"><label for="f-unit">Нэг удаад (заавал биш)</label><input class="inp" id="f-unit" value="${esc(f.unit)}" placeholder="Жишээ нь: 500 мл" autocomplete="off"></div>`;
   }
   if (f.kind==="block" && editing && f.cat==="class"){
@@ -772,7 +809,7 @@ function readInputs(){
   if (g("f-nodate")) form.nodate = g("f-nodate").checked;
   if (g("f-exam")) form.exam = g("f-exam").checked;
   if (g("f-unit")) form.unit = g("f-unit").value;
-  form.steps && form.steps.forEach((_,i) => { const el = g("f-step-"+i); if (el) form.steps[i] = el.value; });
+  form.steps && form.steps.forEach((_,i) => { const el = g("f-step-"+i); if (el) form.steps[i] = el.value; const tm = g("f-steptime-"+i); if (tm) form.stepTimes[i] = tm.value; });
   if (g("f-until")) form.until = g("f-until").value;
 }
 function save(){
@@ -792,7 +829,7 @@ function save(){
     upsert(state.blocks, obj);
   } else {
     obj = {id, title, days:f.days.slice().sort(), time:f.time||""};
-    if (f.steps.length > 1){ obj.steps = f.steps.map((st,i)=>st.trim()||String(i+1)); obj.unit = f.unit.trim(); }
+    if (f.steps.length > 1){ obj.steps = f.steps.map((st,i)=>st.trim()||String(i+1)); obj.stepTimes = f.steps.map((_,i)=>f.stepTimes[i]||""); obj.unit = f.unit.trim(); obj.time = obj.stepTimes.find(Boolean)||""; }
     upsert(state.routines, obj);
   }
   persist(); closeSheet(); render();
@@ -817,10 +854,11 @@ document.addEventListener("click", e => {
     if (fb.dataset.f==="kind"){ form.kind=v; if(v==="routine") form.days=[0,1,2,3,4,5,6]; else if(v==="block") form.days=[wd(sel)]; }
     if (fb.dataset.f==="cat") form.cat=v;
     if (fb.dataset.f==="cls") form.cls = form.cls===v ? "" : v;
-    if (fb.dataset.f==="nsteps"){ const n = +v; form.steps = n>1 ? (STEP_DEF[n]||[...Array(n)].map((_,i)=>String(i+1))).slice() : []; }
+    if (fb.dataset.f==="nsteps"){ const n = +v; form.steps = n>1 ? (STEP_DEF[n]||[...Array(n)].map((_,i)=>String(i+1))).slice() : []; form.stepTimes = n>1 ? defTimes(n) : []; }
     if (fb.dataset.f==="remind") form.remind = +v;
     if (fb.dataset.f==="calcat") form.cats = form.cats.includes(v) ? form.cats.filter(x=>x!==v) : [...form.cats, v];
     if (fb.dataset.f==="caltasks") form.tasks = !form.tasks;
+    if (fb.dataset.f==="calroutines") form.routines = !form.routines;
     if (fb.dataset.f==="day"){ const n=+v; form.days = form.days.includes(n)?form.days.filter(x=>x!==n):[...form.days,n]; }
     drawSheet(); return;
   }
@@ -852,13 +890,14 @@ document.addEventListener("click", e => {
     }
     state.checks[k] = arr; persist(); render();
   }
-  else if (act==="sugg"){ const x = SUGG[+a.dataset.i]; openSheet("routine", null, {...x, steps: x.steps ? [...x.steps] : undefined}); }
+  else if (act==="sugg"){ const x = SUGG[+a.dataset.i]; openSheet("routine", null, {...x, steps: x.steps ? [...x.steps] : undefined, stepTimes: x.stepTimes ? [...x.stepTimes] : undefined}); }
   else if (act==="undo"){ const fn = undoFn; hideToast(); if (fn) fn(); }
   else if (act==="edit") openSheet(a.dataset.kind, a.dataset.id);
   else if (act==="new") openSheet(a.dataset.kind);
   else if (act==="save") save();
   else if (act==="del") del();
   else if (act==="cal") openSheet("cal");
+  else if (act==="calr") openSheet("cal", null, {only:"routines"});
   else if (act==="close") closeSheet();
   else if (act==="export") exportICS(false);
   else if (act==="exportshare") exportICS(true);
@@ -944,6 +983,18 @@ document.addEventListener("visibilitychange", () => { if(!document.hidden){ cons
   if (state.seeded.includes(TAG)) return;
   state.routines.forEach(r => { if (!hasSteps(r) && /2\s*(l|л)/i.test(r.title) && /(water|ус)/i.test(r.title)){ r.steps = STEP_DEF[4].slice(); r.unit = "500 мл";
     for (const k in state.checks) if (state.checks[k].includes(r.id)) state.checks[k] = [...state.checks[k].filter(x=>x!==r.id), ...r.steps.map((_,i)=>stepId(r,i))]; } });
+  state.seeded.push(TAG); persist();
+})();
+
+/* ---------- one-time: reminder times for split routines, add creatine ---------- */
+(function addTimesAndCreatine(){
+  const TAG = "times-creatine-v1";
+  if (state.seeded.includes(TAG)) return;
+  state.routines.forEach(r => {
+    if (hasSteps(r) && !r.stepTimes && STEP_DEF[r.steps.length] && r.steps.join()===STEP_DEF[r.steps.length].join()) r.stepTimes = defTimes(r.steps.length);
+  });
+  if (!state.routines.some(r=>/(creat|креат)/i.test(r.title)))
+    state.routines.push({id:"creatine", title:"Креатин 5 г", days:[0,1,2,3,4,5,6], time:"09:00"});
   state.seeded.push(TAG); persist();
 })();
 
